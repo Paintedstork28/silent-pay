@@ -1,0 +1,2895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silent Pay — Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f4f0;--navy:#0f1629;--blue:#2563eb;--blue-light:#eff6ff;
+  --green:#16a34a;--green-bg:#dcfce7;--amber:#d97706;--amber-bg:#fef3c7;
+  --red:#dc2626;--gray:#6b7280;--gray-light:#e5e7eb;--gray-lighter:#f3f4f6;
+  --white:#fff;--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:14px;line-height:1.5}
+
+/* ===== OUTER SHELL ===== */
+.demo-shell{width:100vw;height:100vh;display:flex;flex-direction:column;background:linear-gradient(135deg,#0f1629 0%,#1a2744 100%);position:relative;overflow:hidden}
+
+.demo-topbar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.07)}
+.demo-brand{display:flex;align-items:center;gap:10px}
+.demo-brand .logo{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.demo-brand .tag{font-size:11px;color:rgba(255,255,255,.4);background:rgba(255,255,255,.07);padding:2px 8px;border-radius:4px}
+.demo-progress{display:flex;align-items:center;gap:5px}
+.prog-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .3s ease;cursor:pointer}
+.prog-dot.active{background:#fff;width:20px;border-radius:4px}
+.prog-dot.done{background:rgba(255,255,255,.45)}
+.demo-nav{display:flex;align-items:center;gap:8px}
+.nav-btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font);border:none}
+.nav-back{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+.nav-back:hover{background:rgba(255,255,255,.13)}
+.nav-next{background:#fff;color:var(--navy)}
+.nav-next:hover{background:#e8eaf6}
+.step-counter{font-size:11px;color:rgba(255,255,255,.35);margin-right:4px}
+.nav-explore{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:none}
+.nav-explore:hover{opacity:.9}
+.mode-toggle{display:flex;align-items:center;background:rgba(255,255,255,.08);border-radius:8px;padding:3px;gap:2px}
+.mt-btn{padding:5px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font);border:none;background:transparent;color:rgba(255,255,255,.5)}
+.mt-btn.active{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff}
+.mt-btn:not(.active):hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+.explore-bar{height:36px;background:linear-gradient(90deg,#1e3a8a,#2563eb);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.explore-bar-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:7px}
+.explore-dot{width:6px;height:6px;border-radius:50%;background:#22c55e}
+.explore-back{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:4px 11px;cursor:pointer;font-family:var(--font)}
+.explore-back:hover{background:rgba(255,255,255,.18);color:#fff}
+.sb-item.clickable-nav{cursor:pointer}
+.sb-item.clickable-nav:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.08)}
+/* Explore flow nav */
+.explore-flow-nav{background:#f8faff;border-bottom:1px solid #dbeafe;padding:8px 18px;display:none;align-items:center;gap:10px;flex-shrink:0}
+.efn-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);white-space:nowrap}
+.efn-steps{display:flex;align-items:center;gap:4px;flex:1}
+.efn-step{font-size:11px;font-weight:500;color:var(--gray);padding:3px 9px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.efn-step:hover{background:var(--gray-lighter);color:var(--navy)}
+.efn-step.active{background:var(--blue);color:#fff;font-weight:600}
+.efn-step.done{color:var(--blue)}
+.efn-sep{font-size:10px;color:var(--gray-light)}
+.efn-nav{display:flex;gap:5px}
+.efn-btn{font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;border:1px solid var(--gray-light);background:#fff;color:var(--gray);cursor:pointer;font-family:var(--font)}
+.efn-btn:hover{border-color:var(--blue);color:var(--blue)}
+.efn-btn:disabled{opacity:.35;cursor:default}
+/* Policy sections */
+.policy-section-header{margin:14px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--gray-lighter)}
+.policy-section-title{font-size:12px;font-weight:700;color:var(--navy)}
+.policy-section-sub{font-size:10px;color:var(--gray);margin-top:1px}
+.policy-section-toolbar{display:flex;align-items:center;justify-content:space-between}
+.pr-vault-tag{font-size:10px;font-weight:600;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:3px;margin-right:6px}
+
+/* ===== SCREEN AREA ===== */
+.screen-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 32px 20px;position:relative;overflow:hidden}
+.device-frame{width:100%;max-width:1080px;height:100%;max-height:640px;background:var(--white);border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06);overflow:hidden;position:relative;display:flex}
+
+.spotlight-overlay{position:absolute;inset:0;z-index:10;background:rgba(10,15,35,.55);pointer-events:none;opacity:0;transition:opacity .4s ease;border-radius:12px}
+.spotlight-overlay.active{opacity:1}
+.sp-highlight{position:relative;z-index:12;box-shadow:0 0 0 3px #3b82f6, 0 0 0 6px rgba(59,130,246,.25) !important;border-radius:8px}
+
+/* ===== TOOLTIP ===== */
+.tooltip-card{position:absolute;z-index:20;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.06);width:290px;padding:16px 18px;opacity:0;transform:translateY(8px);transition:all .35s ease;pointer-events:none}
+.tooltip-card.visible{opacity:1;transform:translateY(0);pointer-events:all}
+.tooltip-card::before{content:'';position:absolute;width:10px;height:10px;background:#fff;transform:rotate(45deg)}
+.arrow-left::before{left:-5px;top:50%;margin-top:-5px;box-shadow:-1px 1px 3px rgba(0,0,0,.06)}
+.arrow-top::before{top:-5px;left:50%;margin-left:-5px;box-shadow:-1px -1px 3px rgba(0,0,0,.06)}
+.arrow-bottom::before{bottom:-5px;left:50%;margin-left:-5px}
+.tc-step{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:5px}
+.tc-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.tc-body{font-size:12px;color:#4b5563;line-height:1.55}
+.tc-body strong{color:var(--navy)}
+.tc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--green-bg);color:#15803d;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-top:8px}
+.tc-chip-blue{background:var(--blue-light);color:var(--blue)}
+.tc-chip-amber{background:var(--amber-bg);color:#92400e}
+.tc-footer{margin-top:12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--gray-light);padding-top:10px}
+.tc-cta{background:var(--blue);color:#fff;padding:6px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.tc-cta:hover{background:#1d4ed8}
+.tc-back-btn{background:none;border:none;font-size:12px;color:var(--gray);cursor:pointer;font-family:var(--font)}
+
+/* ===== SIDEBAR ===== */
+.sidebar{width:192px;background:#0f1629;flex-shrink:0;display:flex;flex-direction:column}
+.sb-brand{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-brand .rp{font-size:14px;font-weight:700;color:#fff}
+.sb-brand .rp-sub{font-size:10px;color:rgba(255,255,255,.35)}
+.sb-entity{margin:10px 8px 0;background:rgba(255,255,255,.06);border-radius:7px;padding:8px 10px}
+.sb-entity .e-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);font-weight:600}
+.sb-entity .e-name{font-size:12px;font-weight:600;color:#fff;margin-top:1px}
+.sb-nav{flex:1;padding:10px 0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+.sb-nav::-webkit-scrollbar{width:4px}
+.sb-nav::-webkit-scrollbar-track{background:transparent}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;margin:1px 6px;border-radius:6px;font-size:12px;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer}
+.sb-item:hover{color:rgba(255,255,255,.75);background:rgba(255,255,255,.05)}
+.sb-item.active{color:#fff;background:rgba(37,99,235,.3)}
+.sb-item .si{width:14px;text-align:center;font-size:11px}
+.sb-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.2);padding:8px 14px 3px;font-weight:600}
+.sb-foot{padding:10px 12px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.25)}
+.live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#22c55e;margin-right:4px}
+
+/* ===== MAIN PANEL ===== */
+.main-panel{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+.topbar{height:44px;background:#fff;border-bottom:1px solid var(--gray-light);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;position:sticky;top:0;z-index:5}
+.tb-left{font-size:12px;color:var(--gray)}
+.tb-left strong{color:var(--navy)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.content{padding:18px 20px;flex:1}
+
+/* shared page header */
+.page-title{font-size:17px;font-weight:700;margin-bottom:3px}
+.page-sub{font-size:11px;color:var(--gray);margin-bottom:14px}
+
+/* ===== BADGE ===== */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:600}
+.badge-green{background:var(--green-bg);color:#15803d}
+.badge-amber{background:var(--amber-bg);color:#92400e}
+.badge-blue{background:var(--blue-light);color:var(--blue)}
+.badge-gray{background:var(--gray-lighter);color:var(--gray)}
+
+/* ===== DASHBOARD ===== */
+.balance-hero{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%);border-radius:10px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.bh-label{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.5px}
+.bh-amount{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px;margin-top:2px}
+.bh-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.bh-actions{display:flex;gap:8px}
+.bh-btn{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.bh-btn-primary{background:#fff;color:var(--blue)}
+.bh-btn-outline{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:8px;padding:12px 14px;border:1px solid var(--gray-light)}
+.stat .s-label{font-size:10px;color:var(--gray);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.stat .s-val{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.stat .s-sub{font-size:10px;color:var(--gray);margin-top:2px}
+.stat .s-sub.green{color:var(--green)}
+.tx-card{background:#fff;border-radius:8px;border:1px solid var(--gray-light);overflow:hidden}
+.tx-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--gray-light)}
+.tx-card-header h3{font-size:12px;font-weight:600}
+.tx-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid #f3f3f0;gap:9px}
+.tx-row:last-child{border-bottom:none}
+.tx-icon{width:29px;height:29px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.tx-icon.out{background:#fee2e2}.tx-icon.in{background:#dcfce7}.tx-icon.pend{background:#fef3c7}
+.tx-info{flex:1}
+.tx-name{font-size:12px;font-weight:600}
+.tx-meta{font-size:10px;color:var(--gray)}
+.tx-amt{text-align:right}
+.tx-amt .amt{font-size:12px;font-weight:700}
+.tx-amt .amt.out{color:var(--red)}.tx-amt .amt.in{color:var(--green)}
+.tx-amt .date{font-size:10px;color:var(--gray)}
+
+/* ===== STABLECOIN SELECTOR ===== */
+.exc-bar{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exc-bar-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);flex-shrink:0}
+.exc-pill{display:flex;align-items:center;gap:5px;background:var(--gray-lighter);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--navy)}
+.exc-pill .ep-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0}
+/* dropdown picker */
+.sc-picker{background:#fff;border:1px solid var(--gray-light);border-radius:9px;overflow:hidden;margin-bottom:10px}
+.sc-group-head{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--gray-lighter);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray);border-bottom:1px solid var(--gray-light)}
+.sc-group-head .sgh-flag{font-size:13px}
+.sc-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid #f3f3f0;cursor:pointer;transition:background .1s;gap:10px}
+.sc-row:last-child{border-bottom:none}
+.sc-row:hover{background:#f8f8f6}
+.sc-row.sel{background:var(--blue-light)}
+.sc-row.dimmed{opacity:.45;pointer-events:none}
+.sc-row-left{flex:1;display:flex;align-items:center;gap:10px}
+.sc-ticker{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.sc-info .sc-name{font-size:12px;font-weight:600;color:var(--navy)}
+.sc-info .sc-issuer{font-size:10px;color:var(--gray);margin-top:1px}
+.sc-row-right{text-align:right;flex-shrink:0}
+.sc-sources-inline{display:flex;gap:4px;justify-content:flex-end}
+.sc-src-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--gray-lighter);color:#374151}
+.sc-src-tag.green{background:#dcfce7;color:#15803d}
+.sc-src-tag.amber{background:#fef3c7;color:#92400e}
+.sc-src-tag.red{background:#fee2e2;color:#991b1b}
+.sc-row.sel .sc-src-tag.green{background:rgba(37,99,235,.15);color:var(--blue)}
+/* checkbox */
+.sc-cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--gray-light);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-right:2px}
+.sc-row.sel .sc-cb{background:var(--blue);border-color:var(--blue)}
+.sc-cb-check{font-size:9px;color:#fff;opacity:0}
+.sc-row.sel .sc-cb-check{opacity:1}
+/* PA-recommended toggle bar */
+.pa-toggle-bar{background:#fff;border:1.5px solid var(--blue);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.pa-toggle-label{font-size:12px;font-weight:600;color:var(--navy)}
+.pa-toggle-sub{font-size:10px;color:var(--gray);margin-top:1px}
+.toggle-switch{width:34px;height:20px;border-radius:10px;background:var(--blue);cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.toggle-switch.off{background:var(--gray-light)}
+.toggle-knob{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:3px;left:17px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch.off .toggle-knob{left:3px}
+.settings-note{background:#fff;border:1px solid var(--gray-light);border-radius:7px;padding:10px 13px;font-size:11px;color:var(--gray)}
+.settings-note strong{color:var(--navy)}
+
+/* ===== CHAIN INFO (all supported) ===== */
+.chain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px}
+.chain-card{background:#fff;border:1px solid var(--gray-light);border-radius:9px;padding:13px;position:relative}
+.chain-card .cc-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.chain-card .cc-desc{font-size:10px;color:var(--gray);margin-bottom:8px}
+.chain-stat{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}
+.chain-stat .cs-k{color:var(--gray)}
+.chain-stat .cs-v{font-weight:600}
+.chain-stat .cs-v.green{color:var(--green)}
+.sup-badge{position:absolute;top:8px;right:8px;background:var(--green-bg);color:#15803d;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+.chain-proceed{background:var(--navy);color:#fff;border-radius:8px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:default}
+.cp-left .cp-title{font-size:13px;font-weight:600}
+.cp-left .cp-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+.cp-arrow{font-size:18px;color:rgba(255,255,255,.4)}
+
+/* ===== WALLET CREATION ===== */
+.wallet-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.wallet-card{background:#fff;border:1px solid var(--gray-light);border-radius:9px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;opacity:0;transform:translateY(8px);transition:all .5s ease}
+.wallet-card.revealed{opacity:1;transform:translateY(0)}
+.wc-left{display:flex;align-items:center;gap:12px}
+.wc-chain-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.wc-name{font-size:13px;font-weight:600}
+.wc-type{font-size:10px;color:var(--gray);margin-top:1px}
+.wc-right{text-align:right}
+.wc-addr{font-family:var(--mono);font-size:10px;color:var(--gray)}
+.wc-status{margin-top:3px}
+.mpc-info{background:#0f1629;border-radius:8px;padding:12px 14px}
+.mpc-info-title{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:8px}
+.mpc-row{display:flex;gap:8px;padding:5px 0;font-size:11px;color:rgba(255,255,255,.55);border-bottom:1px solid rgba(255,255,255,.05);opacity:0;transform:translateX(-6px);transition:all .45s ease}
+.mpc-row:last-child{border-bottom:none}
+.mpc-row.revealed{opacity:1;transform:translateX(0)}
+.mpc-row .mpc-icon{color:#60a5fa;font-weight:600;width:80px;flex-shrink:0}
+.mpc-status{font-size:9px;color:rgba(255,255,255,.3);font-weight:600;margin-left:auto;flex-shrink:0;font-family:var(--mono)}
+.mpc-status.active{color:#fbbf24}
+.mpc-status.done{color:#4ade80}
+.mpc-info-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mpc-computing{font-size:10px;color:#fbbf24;font-weight:600;display:none}
+.mpc-computing.visible{display:block}
+.mpc-done{font-size:10px;color:#4ade80;font-weight:600;display:none}
+.mpc-done.visible{display:block}
+
+/* ===== BENEFICIARY FORM ===== */
+.settle-type-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.settle-type-card{background:#fff;border:2px solid var(--gray-light);border-radius:9px;padding:11px;cursor:pointer;transition:all .15s;text-align:center}
+.settle-type-card.sel{border-color:var(--blue);background:var(--blue-light)}
+.settle-type-card .st-icon{font-size:18px;margin-bottom:3px}
+.settle-type-card .st-label{font-size:12px;font-weight:700;color:var(--navy)}
+.settle-type-card .st-sub{font-size:9px;color:var(--gray);margin-top:1px}
+.settle-type-card.sel .st-sub{color:var(--blue)}
+.bene-subform{background:#fff;border-radius:8px;border:1px solid var(--gray-light);padding:13px;margin-bottom:10px}
+.bene-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-group{margin-bottom:0}
+.form-group.full{grid-column:1/-1}
+.form-group label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:4px}
+.form-group input,.form-group select{width:100%;padding:8px 10px;border:1.5px solid var(--gray-light);border-radius:7px;font-size:12px;font-family:var(--font);color:var(--navy);background:#fff}
+.crypto-settle-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.crypto-settle-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px}
+.crypto-addr-input{width:100%;padding:9px 11px;border:1.5px solid var(--gray-light);border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--navy);background:var(--gray-lighter);margin-bottom:8px}
+.verified-row{display:flex;align-items:center;justify-content:space-between;background:var(--gray-lighter);border-radius:7px;padding:10px 12px;font-size:12px}
+.verified-row .vr-name{font-weight:600}
+.verified-row .vr-bank{color:var(--gray);font-size:11px}
+
+/* ===== RECEIVE FLOW ===== */
+.receive-wallet-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.receive-wallet{background:#fff;border:2px solid var(--gray-light);border-radius:9px;padding:11px;cursor:pointer;transition:all .15s}
+.receive-wallet.sel{border-color:var(--blue);background:var(--blue-light)}
+.rw-label{font-size:11px;font-weight:700;color:var(--navy)}
+.rw-addr{font-family:var(--mono);font-size:9px;color:var(--gray);margin-top:2px}
+.rw-chains{font-size:9px;color:var(--gray);margin-top:3px}
+.receive-currency-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}
+.receive-currency{background:#fff;border:2px solid var(--gray-light);border-radius:8px;padding:9px;cursor:pointer;transition:all .15s;text-align:center}
+.receive-currency.sel{border-color:var(--blue);background:var(--blue-light)}
+.rc-ticker{font-size:13px;font-weight:700;color:var(--navy)}
+.rc-sub{font-size:9px;color:var(--gray);margin-top:1px}
+.generated-link-card{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.gl-title{font-size:11px;font-weight:600;color:#15803d;margin-bottom:6px}
+.gl-url{font-family:var(--mono);font-size:10px;color:#166534;background:#fff;border-radius:5px;padding:7px 10px;word-break:break-all;border:1px solid #bbf7d0}
+.gl-actions{display:flex;gap:7px;margin-top:8px}
+.gl-btn{padding:5px 13px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
+.gl-btn-copy{background:#15803d;color:#fff}
+.gl-btn-open{background:#fff;color:#15803d;border:1px solid #bbf7d0}
+
+/* ===== PAYER CHECKOUT PAGE ===== */
+.payer-page{background:#f1f5f9;min-height:100%;display:flex;flex-direction:column;align-items:center;padding:16px 20px}
+.pp-topbar{display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:11px;color:var(--gray)}
+.pp-topbar .pp-lock{color:var(--green)}
+.pp-card{background:#fff;border-radius:12px;border:1px solid var(--gray-light);width:100%;max-width:340px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+.pp-header{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:14px 18px;color:#fff}
+.pp-from{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:1px}
+.pp-company{font-size:14px;font-weight:700}
+.pp-amount-big{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-top:4px}
+.pp-amount-sub{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}
+.pp-body{padding:13px 16px}
+.pp-field{margin-bottom:9px}
+.pp-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:3px}
+.pp-field input,.pp-field select{width:100%;padding:7px 9px;border:1.5px solid var(--gray-light);border-radius:6px;font-size:12px;font-family:var(--font);color:var(--navy)}
+.pp-method-note{background:var(--blue-light);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--blue);margin-bottom:10px}
+.pp-cta{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.pp-footer{font-size:10px;color:var(--gray);text-align:center;margin-top:8px}
+.pp-footer a{color:var(--blue)}
+
+/* ===== FUND ACCOUNT ===== */
+.fund-flow-banner{display:flex;align-items:center;gap:6px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap}
+.ffb-step{display:flex;align-items:center;gap:6px}
+.ffb-num{width:20px;height:20px;border-radius:50%;background:var(--gray-light);color:var(--gray);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ffb-step.active .ffb-num{background:var(--blue);color:#fff}
+.ffb-label{font-size:11px;font-weight:500;color:var(--gray)}
+.ffb-step.active .ffb-label{color:var(--blue);font-weight:600}
+.ffb-arrow{font-size:12px;color:#93c5fd;flex-shrink:0}
+.fund-wire-card{background:#fff;border:1px solid var(--gray-light);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.fwc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.fwc-title{font-size:13px;font-weight:700;color:var(--navy)}
+.fwc-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--gray-lighter);font-size:12px}
+.fwc-row:last-of-type{border-bottom:none}
+.fwc-k{color:var(--gray);font-weight:500}
+.fwc-v{color:var(--navy);font-weight:600}
+.fwc-v.mono{font-family:var(--mono);font-size:11px;letter-spacing:.3px}
+.highlight-row .fwc-k{color:var(--navy)}
+.ref-tag{background:var(--amber-bg);color:#92400e;padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:700}
+.fwc-note{font-size:10px;color:var(--amber);background:var(--amber-bg);border-radius:5px;padding:6px 9px;margin-top:10px;line-height:1.4}
+.fund-deposits-card{background:#fff;border:1px solid var(--gray-light);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.fdc-header{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px}
+.fdc-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gray-lighter)}
+.fdc-row:last-child{border-bottom:none}
+.fdc-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.fdc-icon.settled{background:var(--green-bg);color:var(--green)}
+.fdc-icon.pending{background:var(--amber-bg);color:var(--amber)}
+.fdc-info{flex:1;min-width:0}
+.fdc-name{font-size:11px;font-weight:600;color:var(--navy)}
+.fdc-meta{font-size:10px;color:var(--gray);margin-top:1px}
+.fdc-amt{font-size:12px;font-weight:700;color:var(--green);flex-shrink:0}
+.fdc-amt.pending-amt{color:var(--amber)}
+.fund-disclaimer{font-size:10px;color:var(--gray);text-align:center;line-height:1.5;padding:0 4px}
+
+/* ===== REPORTS ===== */
+.rpt-summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rpt-stat{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:10px 12px}
+.rpt-stat-val{font-size:18px;font-weight:700;color:var(--navy)}
+.rpt-stat-val.green{color:var(--green)}
+.rpt-stat-lbl{font-size:10px;color:var(--gray);margin-top:2px}
+.rpt-filters{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.rpt-filter{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--gray-light);background:#fff;color:var(--gray);cursor:pointer;font-family:var(--font)}
+.rpt-filter.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.rpt-table{background:#fff;border:1px solid var(--gray-light);border-radius:8px;overflow:hidden}
+.rpt-thead{display:grid;grid-template-columns:1fr 80px 70px 70px 60px;padding:7px 12px;background:var(--gray-lighter);border-bottom:1px solid var(--gray-light)}
+.rpt-th{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.4px}
+.rpt-row{display:grid;grid-template-columns:1fr 80px 70px 70px 60px;padding:8px 12px;border-bottom:1px solid var(--gray-lighter);align-items:center}
+.rpt-row:last-child{border-bottom:none}
+.rpt-bene{font-size:11px;font-weight:600;color:var(--navy)}
+.rpt-meta{font-size:10px;color:var(--gray)}
+.rpt-cell{font-size:11px;color:var(--navy)}
+.rpt-export{display:flex;align-items:center;justify-content:flex-end;margin-top:10px}
+.rpt-export-btn{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:5px;padding:5px 12px;cursor:pointer;font-family:var(--font)}
+/* Savings report */
+.savings-banner{background:linear-gradient(135deg,#0f1629,#1e3a8a);border-radius:10px;padding:16px 18px;margin-bottom:12px;color:#fff}
+.sv-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.5);margin-bottom:6px}
+.sv-amount{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.sv-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px}
+.sv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.sv-cell{background:rgba(255,255,255,.08);border-radius:6px;padding:8px 10px}
+.sv-cell-val{font-size:14px;font-weight:700;color:#fff}
+.sv-cell-lbl{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+
+/* ===== POLICY ENGINE ===== */
+.policy-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.policy-add-btn{font-size:11px;font-weight:700;background:var(--blue);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:var(--font)}
+.policy-list{display:flex;flex-direction:column;gap:8px}
+.policy-rule{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:11px 14px}
+.policy-rule.active{border-left:3px solid var(--green)}
+.policy-rule.warn{border-left:3px solid var(--amber)}
+.pr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.pr-name{font-size:12px;font-weight:700;color:var(--navy)}
+.pr-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px}
+.pr-badge.allow{background:var(--green-bg);color:var(--green)}
+.pr-badge.block{background:#fee2e2;color:var(--red)}
+.pr-badge.approve{background:var(--amber-bg);color:#92400e}
+.pr-desc{font-size:11px;color:#4b5563;line-height:1.45}
+.pr-chips{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.pr-chip{font-size:10px;background:var(--gray-lighter);color:var(--gray);padding:2px 7px;border-radius:3px;font-family:var(--mono)}
+.pr-actions{display:flex;gap:6px;margin-top:7px}
+.pr-edit-btn{font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-light);border:1px solid #bfdbfe;border-radius:4px;padding:3px 9px;cursor:pointer;font-family:var(--font)}
+.pr-del-btn{font-size:10px;font-weight:600;color:var(--gray);background:var(--gray-lighter);border:1px solid var(--gray-light);border-radius:4px;padding:3px 9px;cursor:pointer;font-family:var(--font)}
+.policy-modal{display:none;position:absolute;inset:0;background:rgba(15,22,41,.6);z-index:30;align-items:center;justify-content:center;border-radius:12px}
+.policy-modal.open{display:flex}
+.pm-card{background:#fff;border-radius:10px;width:340px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pm-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px}
+.pm-field{margin-bottom:10px}
+.pm-field label{display:block;font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.pm-field input,.pm-field select{width:100%;font-size:12px;padding:7px 10px;border:1px solid var(--gray-light);border-radius:6px;font-family:var(--font);color:var(--navy);background:#fff}
+.pm-btns{display:flex;gap:8px;margin-top:14px}
+.pm-save{flex:1;background:var(--blue);color:#fff;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.pm-cancel{background:var(--gray-lighter);color:var(--gray);border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+
+/* ===== WEBHOOKS & API KEYS ===== */
+.dev-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--gray-light);border-radius:7px;overflow:hidden;background:var(--gray-lighter)}
+.dev-tab{flex:1;text-align:center;font-size:11px;font-weight:600;padding:7px;cursor:pointer;color:var(--gray)}
+.dev-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.wh-endpoint-card{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.wh-url{font-family:var(--mono);font-size:11px;color:var(--navy);font-weight:500;margin-bottom:6px}
+.wh-events{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.wh-evt{font-size:10px;background:var(--blue-light);color:var(--blue);padding:2px 6px;border-radius:3px;font-family:var(--mono)}
+.wh-log{background:var(--gray-lighter);border-radius:6px;padding:8px 10px;margin-top:8px}
+.wh-log-title{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.wh-log-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-light);font-size:10px}
+.wh-log-row:last-child{border-bottom:none}
+.wh-status{font-weight:700;width:28px}
+.wh-status.ok{color:var(--green)}
+.wh-status.err{color:var(--red)}
+.wh-event-name{flex:1;font-family:var(--mono);color:var(--gray)}
+.wh-ts{color:var(--gray)}
+.wh-retry-btn{font-size:10px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:600}
+.apikey-row{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:11px 14px;margin-bottom:8px}
+.ak-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.ak-name{font-size:12px;font-weight:700;color:var(--navy)}
+.ak-env{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px}
+.ak-env.prod{background:#fee2e2;color:var(--red)}
+.ak-env.sandbox{background:var(--green-bg);color:var(--green)}
+.ak-key{font-family:var(--mono);font-size:10px;color:var(--gray);margin-bottom:5px}
+.ak-meta{font-size:10px;color:var(--gray)}
+.ak-revoke{font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:600}
+.notif-section{margin-bottom:14px}
+.notif-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff;border:1px solid var(--gray-light);border-radius:7px;margin-bottom:5px}
+.notif-label{font-size:12px;color:var(--navy)}
+.notif-sub{font-size:10px;color:var(--gray)}
+.notif-toggle{width:36px;height:20px;border-radius:10px;background:var(--blue);cursor:pointer;position:relative;flex-shrink:0}
+.notif-toggle.off{background:var(--gray-light)}
+.nt-knob{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:3px;left:19px;transition:left .2s}
+.notif-toggle.off .nt-knob{left:3px}
+
+/* ===== AUDIT TRAIL ===== */
+.audit-filters{display:flex;gap:6px;margin-bottom:10px}
+.audit-table{background:#fff;border:1px solid var(--gray-light);border-radius:8px;overflow:hidden}
+.audit-thead{display:grid;grid-template-columns:100px 1fr 80px 60px;padding:7px 12px;background:var(--gray-lighter);border-bottom:1px solid var(--gray-light)}
+.audit-row{display:grid;grid-template-columns:100px 1fr 80px 60px;padding:8px 12px;border-bottom:1px solid var(--gray-lighter);align-items:center;font-size:11px}
+.audit-row:last-child{border-bottom:none}
+.audit-ts{font-family:var(--mono);font-size:10px;color:var(--gray)}
+.audit-action{color:var(--navy);font-weight:500}
+.audit-actor{font-size:10px;color:var(--gray)}
+.audit-result{font-size:10px;font-weight:700}
+.audit-result.ok{color:var(--green)}
+.audit-result.blocked{color:var(--red)}
+
+/* ===== GAS STATION ===== */
+.gas-chain-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.gas-card{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:11px 13px}
+.gas-chain-name{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.gas-bar-wrap{height:6px;background:var(--gray-light);border-radius:3px;margin-bottom:5px;overflow:hidden}
+.gas-bar{height:6px;border-radius:3px;background:var(--green)}
+.gas-bar.warn{background:var(--amber)}
+.gas-stat-row{display:flex;justify-content:space-between;font-size:10px}
+.gas-stat-lbl{color:var(--gray)}
+.gas-stat-val{color:var(--navy);font-weight:600;font-family:var(--mono)}
+
+/* ===== EXCHANGE CONNECTIVITY ===== */
+.exc-conn-card{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.exc-conn-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.exc-conn-name{font-size:13px;font-weight:700;color:var(--navy)}
+.exc-conn-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
+.exc-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.exc-dot.warn{background:var(--amber)}
+.exc-balances{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.exc-bal-item{background:var(--gray-lighter);border-radius:5px;padding:6px 8px}
+.exc-bal-symbol{font-size:10px;font-weight:700;color:var(--gray)}
+.exc-bal-amount{font-size:12px;font-weight:700;color:var(--navy);margin-top:1px}
+.exc-meta{font-size:10px;color:var(--gray);margin-top:7px}
+
+/* ===== MULTI-CURRENCY ===== */
+.mcurr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mcurr-card{background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:11px 13px}
+.mcurr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.mcurr-symbol{font-size:12px;font-weight:700;color:var(--navy)}
+.mcurr-chain{font-size:10px;color:var(--gray)}
+.mcurr-amount{font-size:16px;font-weight:700;color:var(--navy)}
+.mcurr-usd{font-size:10px;color:var(--gray);margin-top:1px}
+.mcurr-change{font-size:10px;font-weight:600}
+.mcurr-change.pos{color:var(--green)}
+.mcurr-change.neg{color:var(--red)}
+.mcurr-alloc-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:6px;gap:1px}
+.mcurr-alloc-seg{height:100%}
+
+/* ===== SEND: BENE SELECTION ===== */
+.bene-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.bene-card{background:#fff;border:2px solid var(--gray-light);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.bene-card:hover,.bene-card.sel{border-color:var(--blue);background:var(--blue-light)}
+.bene-name{font-size:12px;font-weight:600}
+.bene-bank{font-size:10px;color:var(--gray)}
+.bene-flag{font-size:10px;color:var(--gray);margin-top:2px}
+
+/* ===== SEND: AMOUNT ===== */
+.amount-form{background:#fff;border-radius:8px;border:1px solid var(--gray-light);padding:14px;margin-bottom:12px}
+.form-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:5px}
+.form-input{width:100%;padding:8px 10px;border:1.5px solid var(--gray-light);border-radius:7px;font-size:13px;font-family:var(--font);color:var(--navy)}
+.fx-display{background:var(--blue-light);border-radius:8px;padding:11px 13px;margin:8px 0}
+.fx-amount{font-size:20px;font-weight:700;color:var(--blue);letter-spacing:-.3px}
+.fx-sub{font-size:11px;color:#3b82f6;margin-top:2px}
+.arrow-mid{text-align:center;color:var(--gray);font-size:14px;padding:3px 0}
+.stable-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--blue);margin-top:8px;background:var(--blue-light);border-radius:6px;padding:6px 10px}
+
+/* ===== SEND: REVIEW ===== */
+.review-card{background:#fff;border-radius:8px;border:1px solid var(--gray-light);padding:14px;margin-bottom:10px}
+.review-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f3f0;font-size:12px}
+.review-row:last-child{border-bottom:none}
+.r-label{color:var(--gray)}.r-val{font-weight:600}.r-val.blue{color:var(--blue)}
+.fee-table{font-size:11px;width:100%}
+.fee-table td{padding:3px 0}.fee-table td:last-child{text-align:right;font-weight:600}
+.fee-table tr.total td{font-size:12px;font-weight:700;padding-top:8px;border-top:1.5px solid var(--gray-light)}
+.savings-note{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:8px 12px;font-size:11px;color:#15803d;margin-top:8px}
+.btn-primary{background:var(--blue);color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);width:100%;margin-top:8px}
+
+/* ===== PIPELINE ===== */
+.pl-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.pl-title{font-size:17px;font-weight:700}
+.pl-sub{font-size:11px;color:var(--gray);margin-top:2px}
+.pl-badge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.pl-steps{background:#fff;border-radius:8px;border:1px solid var(--gray-light);padding:12px 14px;margin-bottom:12px}
+.pl-step{display:flex;gap:10px;padding:8px 0}
+.pl-step:last-child{padding-bottom:0}
+.ps-col{display:flex;flex-direction:column;align-items:center;width:24px;flex-shrink:0}
+.ps-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--gray-light);background:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.ps-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.ps-dot.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.ps-dot.wait{color:var(--gray)}
+.ps-line{flex:1;width:2px;background:var(--gray-light);margin:2px 0}
+.ps-line.done{background:var(--green)}
+.ps-body{flex:1;padding-top:1px}
+.ps-title{font-size:12px;font-weight:600}
+.ps-desc{font-size:11px;color:var(--gray);margin-top:1px}
+.ps-chip{display:inline-block;background:var(--gray-lighter);border-radius:4px;padding:2px 6px;font-size:9px;font-family:var(--mono);color:var(--gray);margin-top:3px}
+.ps-time{font-size:10px;color:var(--gray);margin-top:2px}
+.uth{background:#0f1629;border-radius:8px;padding:11px 13px}
+.uth-title{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:7px}
+.uth-row{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px}
+.uth-row:last-child{border-bottom:none}
+.uth-actor{color:#60a5fa;font-weight:600;width:76px;flex-shrink:0}
+.uth-action{color:rgba(255,255,255,.6)}
+.uth-api{color:#4ade80;font-family:var(--mono);font-size:9px}
+
+/* ===== COMPLETE ===== */
+.complete-hero{background:linear-gradient(135deg,#14532d 0%,#16a34a 100%);border-radius:10px;padding:18px;text-align:center;margin-bottom:14px;color:#fff}
+.ch-icon{font-size:28px;margin-bottom:6px}
+.ch-title{font-size:17px;font-weight:700;margin-bottom:3px}
+.ch-sub{font-size:11px;color:rgba(255,255,255,.7)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.compare-card{background:#fff;border-radius:8px;border:1px solid var(--gray-light);padding:13px}
+.compare-card.winner{border-color:#22c55e;background:#f0fdf4}
+.cc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.cc-label.green{color:var(--green)}.cc-label.gray{color:var(--gray)}
+.compare-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
+.cr-key{color:var(--gray)}.cr-val{font-weight:600}
+.cr-val.green{color:var(--green)}.cr-val.red{color:var(--red)}
+.savings-big{background:var(--blue-light);border-radius:8px;padding:13px;text-align:center}
+.sb-num{font-size:24px;font-weight:700;color:var(--blue);letter-spacing:-.4px}
+.sb-label-txt{font-size:11px;color:#3b82f6;margin-top:2px}
+
+/* ===== INTRO SCREEN ===== */
+.intro-screen{position:absolute;inset:0;background:#080d1a;z-index:30;display:flex;flex-direction:column;overflow:hidden}
+.intro-screen.hidden{display:none}
+/* Login landing */
+.login-landing{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.login-landing.hidden{display:none}
+.login-logo{font-size:11px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:32px}
+.login-heading{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.4px;margin-bottom:8px}
+.login-sub{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:36px}
+.login-cards{display:flex;gap:14px}
+.login-card{width:220px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:22px 20px;cursor:pointer;transition:all .2s;text-align:left;font-family:var(--font)}
+.login-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
+.login-card.primary{border-color:rgba(59,130,246,.35);background:rgba(37,99,235,.08)}
+.login-card.primary:hover{background:rgba(37,99,235,.15);border-color:#3b82f6}
+.lc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+.lc-icon.merchant{background:rgba(255,255,255,.07)}
+.lc-icon.pa{background:linear-gradient(135deg,rgba(37,99,235,.3),rgba(124,58,237,.3))}
+.lc-role{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.3);margin-bottom:4px}
+.lc-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.lc-desc{font-size:11px;color:rgba(255,255,255,.35);line-height:1.5;margin-bottom:16px}
+.lc-btn{width:100%;padding:8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);border:none;transition:all .15s}
+.lc-btn.merchant-btn{background:rgba(255,255,255,.1);color:#fff}
+.lc-btn.merchant-btn:hover{background:rgba(255,255,255,.18)}
+.lc-btn.pa-btn{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff}
+.lc-btn.pa-btn:hover{opacity:.9}
+/* PA Console */
+.pa-console{flex:1;display:none;flex-direction:column;overflow:hidden}
+.pa-console.visible{display:flex}
+.pa-topbar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:50px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.pa-back{background:none;border:none;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;padding:0;transition:color .15s}
+.pa-back:hover{color:rgba(255,255,255,.8)}
+.pa-brand{display:flex;align-items:center;gap:8px}
+.pa-brand-name{font-size:13px;font-weight:700;color:#fff}
+.pa-entity-pill{font-size:10px;color:rgba(255,255,255,.4);background:rgba(255,255,255,.07);padding:3px 9px;border-radius:20px}
+.pa-user{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.35)}
+.pa-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.pa-body{flex:1;padding:20px 24px;overflow-y:auto}
+.pa-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.pa-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 15px}
+.pa-stat-val{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.pa-stat-label{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.pa-stat-delta{font-size:10px;color:#34d399;margin-top:4px}
+.pa-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pa-section-title{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.6px}
+.pa-search{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 12px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font);outline:none;width:160px}
+.pa-search::placeholder{color:rgba(255,255,255,.25)}
+.pa-add-btn{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:none;padding:7px 13px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.pa-table{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden}
+.pa-thead{display:grid;grid-template-columns:2fr 0.7fr 1.1fr 1.1fr 0.8fr 0.65fr;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pa-th{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.25)}
+.pa-row{display:grid;grid-template-columns:2fr 0.7fr 1.1fr 1.1fr 0.8fr 0.65fr;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;transition:background .1s}
+.pa-row:last-child{border-bottom:none}
+.pa-row:hover{background:rgba(255,255,255,.025)}
+.pa-row.highlight{background:rgba(37,99,235,.07);border-left:2px solid #3b82f6}
+.pa-cell{font-size:11px;color:rgba(255,255,255,.5)}
+.pa-biz-name{font-size:12px;font-weight:600;color:#fff}
+.pa-biz-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+.pa-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.pa-badge.active{background:rgba(52,211,153,.12);color:#34d399}
+.pa-badge.onboard{background:rgba(251,191,36,.1);color:#fbbf24}
+.pa-badge.paused{background:rgba(255,255,255,.06);color:rgba(255,255,255,.35)}
+.pa-view-btn{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25);padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s}
+.pa-view-btn:hover{background:#2563eb;color:#fff;border-color:#2563eb}
+.pa-view-btn.disabled{opacity:.3;cursor:default;pointer-events:none}
+/* Merchant detail panel — full overlay inside intro-screen */
+.pa-merchant-detail{position:absolute;inset:0;background:#080d1a;z-index:5;display:none;flex-direction:column;overflow:hidden}
+.pa-merchant-detail.visible{display:flex}
+.pamd-topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:50px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.pamd-back{background:none;border:none;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;padding:0;transition:color .15s}
+.pamd-back:hover{color:rgba(255,255,255,.8)}
+.pamd-title{display:flex;align-items:center;gap:10px}
+.pamd-name{font-size:14px;font-weight:700;color:#fff}
+.pamd-tabs{display:flex;gap:0;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.pamd-tab{padding:9px 16px;font-size:12px;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;border:none;background:transparent;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.pamd-tab.active{color:#fff;border-bottom-color:#3b82f6}
+.pamd-tab:hover:not(.active){color:rgba(255,255,255,.6)}
+.pamd-body{flex:1;min-height:0;padding:16px 24px;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:start}
+.pamd-body.hidden{display:none}
+.pamd-txn-body{flex:1;min-height:0;padding:16px 24px;overflow-y:auto;display:none;flex-direction:column;gap:10px}
+.pamd-txn-body.visible{display:flex}
+.pamd-filters{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-bottom:4px}
+.pamd-filter-select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.6);font-family:var(--font);outline:none}
+.pamd-filter-select option{background:#1a2744}
+.pamd-vol-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.pamd-vol-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:12px 14px}
+.pamd-vol-val{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.pamd-vol-label{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+.pamd-txn-table{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden}
+.pamd-txn-thead{display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 0.8fr 0.7fr;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pamd-txn-th{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.25)}
+.pamd-txn-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 0.8fr 0.8fr 0.7fr;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center}
+.pamd-txn-row:last-child{border-bottom:none}
+.pamd-txn-row:hover{background:rgba(255,255,255,.02)}
+.pamd-txn-id{font-size:11px;font-weight:600;color:#93c5fd;font-family:monospace}
+.pamd-txn-cell{font-size:11px;color:rgba(255,255,255,.5)}
+.pamd-txn-amt{font-size:11px;font-weight:600;color:#fff}
+.pamd-txn-status{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600}
+.pamd-txn-status.confirmed{background:rgba(52,211,153,.12);color:#34d399}
+.pamd-txn-status.pending{background:rgba(251,191,36,.1);color:#fbbf24}
+.pamd-txn-status.failed{background:rgba(239,68,68,.1);color:#f87171}
+.pamd-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px}
+.pamd-card.full{grid-column:1/-1}
+.pamd-card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:12px}
+.pamd-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.pamd-row:last-child{border-bottom:none}
+.pamd-key{font-size:11px;color:rgba(255,255,255,.4)}
+.pamd-val{font-size:11px;font-weight:600;color:#fff}
+.pamd-val.ok{color:#34d399}
+.pamd-val.warn{color:#fbbf24}
+.pamd-val.off{color:rgba(255,255,255,.25)}
+.flag-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.flag-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px}
+.flag-label{font-size:11px;color:rgba(255,255,255,.55)}
+.flag-on{font-size:10px;font-weight:700;color:#34d399}
+.flag-off{font-size:10px;font-weight:700;color:rgba(255,255,255,.2)}
+.usage-bar-wrap{margin-top:6px}
+.usage-bar-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px}
+.usage-bar-track{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.usage-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2563eb,#7c3aed)}
+
+/* send-view shared wrapper */
+.send-view{padding:18px 20px;display:none}
+.pipeline-view{padding:18px 20px;display:none}
+.complete-view{padding:18px 20px;display:none}
+
+/* ===== FX RATE VIEW ===== */
+.fx-loading{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:28px;background:#fff;border-radius:9px;border:1px solid var(--gray-light);margin-bottom:12px}
+.fx-loading-bar{width:140px;height:3px;background:var(--gray-light);border-radius:2px;overflow:hidden;margin-top:4px}
+.fx-loading-fill{width:0%;height:100%;background:var(--blue);border-radius:2px;animation:fxbar 1.4s ease forwards}
+@keyframes fxbar{from{width:0%}to{width:100%}}
+.fx-step-row{background:#fff;border:1px solid var(--gray-light);border-radius:9px;padding:14px;margin-bottom:10px}
+.fx-step-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px}
+.fx-step-rate{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.fx-step-calc{font-size:11px;color:var(--gray);margin-top:3px}
+.fx-step-head{display:flex;align-items:center;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="demo-shell">
+
+<!-- INTRO SCREEN -->
+<div class="intro-screen" id="intro">
+
+  <!-- State 1: Login selector -->
+  <div class="login-landing" id="login-landing">
+    <div class="login-logo">Silent Pay · by Silence Laboratories</div>
+    <div class="login-heading">Who are you logging in as?</div>
+    <div class="login-sub">Choose a view to explore</div>
+    <div class="login-cards">
+      <div class="login-card" onclick="startDemo()">
+        <div class="lc-icon merchant">🏢</div>
+        <div class="lc-role">Merchant</div>
+        <div class="lc-name">Acme Corp</div>
+        <div class="lc-desc">B2B Exporter · Mumbai<br>PayFlow Corp customer</div>
+        <button class="lc-btn merchant-btn">Login as Acme Corp →</button>
+      </div>
+      <div class="login-card primary" onclick="showPAConsole()">
+        <div class="lc-icon pa">🏦</div>
+        <div class="lc-role">Licensed Payment Entity</div>
+        <div class="lc-name">PayFlow Corp</div>
+        <div class="lc-desc">Licensed Payments Entity<br>Operator view · 247 businesses</div>
+        <button class="lc-btn pa-btn">Login as PayFlow Corp →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 2: PA Console -->
+  <div class="pa-console" id="pa-console">
+    <div class="pa-topbar">
+      <button class="pa-back" onclick="hidePAConsole()">← Back</button>
+      <div class="pa-brand">
+        <div class="pa-brand-name">Silent Pay</div>
+        <div class="pa-entity-pill">PA Console · PayFlow Corp (Licensed Payments Entity)</div>
+      </div>
+      <div class="pa-user">
+        <span>admin@payflowcorp.com</span>
+        <div class="pa-avatar">PF</div>
+      </div>
+    </div>
+    <div class="pa-body">
+      <div class="pa-stats">
+        <div class="pa-stat">
+          <div class="pa-stat-val">247</div>
+          <div class="pa-stat-label">Businesses</div>
+          <div class="pa-stat-delta">↑ 12 this month</div>
+        </div>
+        <div class="pa-stat">
+          <div class="pa-stat-val">$12.4M</div>
+          <div class="pa-stat-label">Volume (30d)</div>
+          <div class="pa-stat-delta">↑ 18% vs prior period</div>
+        </div>
+        <div class="pa-stat">
+          <div class="pa-stat-val">491</div>
+          <div class="pa-stat-label">Active Wallets</div>
+          <div class="pa-stat-delta">EVM + Solana</div>
+        </div>
+        <div class="pa-stat">
+          <div class="pa-stat-val">99.97%</div>
+          <div class="pa-stat-label">Uptime (90d)</div>
+          <div class="pa-stat-delta">SLA: 99.9%</div>
+        </div>
+      </div>
+      <div class="pa-section-head">
+        <div class="pa-section-title">Businesses</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="pa-search" placeholder="Search businesses...">
+          <button class="pa-add-btn">+ Onboard Business</button>
+        </div>
+      </div>
+      <div class="pa-table">
+        <div class="pa-thead">
+          <span class="pa-th">Business</span>
+          <span class="pa-th">Wallets</span>
+          <span class="pa-th">Volume (30d)</span>
+          <span class="pa-th">Last Active</span>
+          <span class="pa-th">Status</span>
+          <span class="pa-th"></span>
+        </div>
+        <div class="pa-row highlight">
+          <div><div class="pa-biz-name">Acme Corp</div><div class="pa-biz-sub">Mumbai · B2B Exports</div></div>
+          <div class="pa-cell">2 wallets</div>
+          <div class="pa-cell">$125,400</div>
+          <div class="pa-cell">2 min ago</div>
+          <div><span class="pa-badge active">Active</span></div>
+          <div><button class="pa-view-btn" onclick="showMerchantDetail()">View →</button></div>
+        </div>
+        <div class="pa-row">
+          <div><div class="pa-biz-name">Meridian Global</div><div class="pa-biz-sub">Dubai · Logistics</div></div>
+          <div class="pa-cell">4 wallets</div>
+          <div class="pa-cell">$210,800</div>
+          <div class="pa-cell">5 hrs ago</div>
+          <div><span class="pa-badge active">Active</span></div>
+          <div><button class="pa-view-btn disabled">View →</button></div>
+        </div>
+        <div class="pa-row">
+          <div><div class="pa-biz-name">TechFlow Pte Ltd</div><div class="pa-biz-sub">Singapore · SaaS</div></div>
+          <div class="pa-cell">3 wallets</div>
+          <div class="pa-cell">$84,200</div>
+          <div class="pa-cell">1 hr ago</div>
+          <div><span class="pa-badge active">Active</span></div>
+          <div><button class="pa-view-btn disabled">View →</button></div>
+        </div>
+        <div class="pa-row">
+          <div><div class="pa-biz-name">NexPay HK</div><div class="pa-biz-sub">Hong Kong · Fintech</div></div>
+          <div class="pa-cell">1 wallet</div>
+          <div class="pa-cell">$31,000</div>
+          <div class="pa-cell">Yesterday</div>
+          <div><span class="pa-badge active">Active</span></div>
+          <div><button class="pa-view-btn disabled">View →</button></div>
+        </div>
+        <div class="pa-row">
+          <div><div class="pa-biz-name">Zara Exports</div><div class="pa-biz-sub">Delhi · Trading</div></div>
+          <div class="pa-cell">2 wallets</div>
+          <div class="pa-cell">$0</div>
+          <div class="pa-cell">3 days ago</div>
+          <div><span class="pa-badge onboard">Onboarding</span></div>
+          <div><button class="pa-view-btn disabled">View →</button></div>
+        </div>
+        <div class="pa-row">
+          <div><div class="pa-biz-name">GlobaTex Ltd</div><div class="pa-biz-sub">Chennai · Manufacturing</div></div>
+          <div class="pa-cell">1 wallet</div>
+          <div class="pa-cell">$8,300</div>
+          <div class="pa-cell">2 days ago</div>
+          <div><span class="pa-badge paused">Paused</span></div>
+          <div><button class="pa-view-btn disabled">View →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merchant settings detail panel (PA view only — no merchant flow) -->
+  <div class="pa-merchant-detail" id="pa-merchant-detail">
+    <div class="pamd-topbar">
+      <button class="pamd-back" onclick="hideMerchantDetail()">← All Businesses</button>
+      <div class="pamd-title">
+        <div class="pamd-name">Acme Corp</div>
+        <span class="pa-badge active">Active</span>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3)">Mumbai · B2B Exports</div>
+    </div>
+    <div class="pamd-tabs">
+      <button class="pamd-tab active" id="pamd-tab-settings" onclick="switchMerchantTab('settings')">Settings</button>
+      <button class="pamd-tab" id="pamd-tab-txns" onclick="switchMerchantTab('txns')">Transactions</button>
+    </div>
+    <div class="pamd-body" id="pamd-settings-body">
+
+      <!-- Row 1: Account overview | Configuration | Applied policy -->
+      <div class="pamd-card">
+        <div class="pamd-card-title">Account Overview</div>
+        <div class="pamd-row"><span class="pamd-key">KYB status</span><span class="pamd-val ok">Verified</span></div>
+        <div class="pamd-row"><span class="pamd-key">Tier</span><span class="pamd-val">Growth · $500K/day</span></div>
+        <div class="pamd-row"><span class="pamd-key">Onboarded</span><span class="pamd-val">14 Jan 2026</span></div>
+        <div class="pamd-row"><span class="pamd-key">API keys</span><span class="pamd-val">2 active</span></div>
+        <div class="pamd-row"><span class="pamd-key">AML screening</span><span class="pamd-val ok">Chainalysis · Active</span></div>
+      </div>
+      <div class="pamd-card">
+        <div class="pamd-card-title">Configuration</div>
+        <div class="pamd-row"><span class="pamd-key">Stablecoins</span><span class="pamd-val">USDC, USDT</span></div>
+        <div class="pamd-row"><span class="pamd-key">Active chains</span><span class="pamd-val">Base, ETH, Polygon, SOL</span></div>
+        <div class="pamd-row"><span class="pamd-key">Wallets</span><span class="pamd-val">2 (EVM + Solana)</span></div>
+        <div class="pamd-row"><span class="pamd-key">Beneficiaries</span><span class="pamd-val">4 approved</span></div>
+        <div class="pamd-row"><span class="pamd-key">Gas management</span><span class="pamd-val ok">Gas Station · On</span></div>
+      </div>
+      <div class="pamd-card">
+        <div class="pamd-card-title">Applied Policy</div>
+        <div class="pamd-row"><span class="pamd-key">Workspace rules</span><span class="pamd-val">4 active</span></div>
+        <div class="pamd-row"><span class="pamd-key">Merchant overrides</span><span class="pamd-val">2 (EVM + Solana)</span></div>
+        <div class="pamd-row"><span class="pamd-key">Whitelist-only</span><span class="pamd-val ok">Enforced</span></div>
+        <div class="pamd-row"><span class="pamd-key">New address hold</span><span class="pamd-val ok">24h · Active</span></div>
+        <div class="pamd-row"><span class="pamd-key">Large tx approval</span><span class="pamd-val warn">> $50K · 2-of-3</span></div>
+      </div>
+
+      <!-- Row 2: Feature flags (full width, 4-col grid) -->
+      <div class="pamd-card full">
+        <div class="pamd-card-title">Feature Flags</div>
+        <div class="flag-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="flag-item"><span class="flag-label">Gas Station</span><span class="flag-on">ON</span></div>
+          <div class="flag-item"><span class="flag-label">Webhooks</span><span class="flag-on">ON</span></div>
+          <div class="flag-item"><span class="flag-label">Exchange Connectivity</span><span class="flag-on">ON</span></div>
+          <div class="flag-item"><span class="flag-label">Receive / Payment Links</span><span class="flag-on">ON</span></div>
+          <div class="flag-item"><span class="flag-label">Email Notifications</span><span class="flag-on">ON</span></div>
+          <div class="flag-item"><span class="flag-label">Multi-currency</span><span class="flag-off">OFF</span></div>
+          <div class="flag-item"><span class="flag-label">Travel Rule Reporting</span><span class="flag-off">OFF</span></div>
+          <div class="flag-item"><span class="flag-label">Batch Transfers</span><span class="flag-off">OFF</span></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Usage vs limits (full width, bars side by side) -->
+      <div class="pamd-card full">
+        <div class="pamd-card-title">Usage vs Limits</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:4px">
+          <div class="usage-bar-wrap">
+            <div class="usage-bar-label"><span>Daily volume</span><span>$125,400 / $500K</span></div>
+            <div class="usage-bar-track"><div class="usage-bar-fill" style="width:25%"></div></div>
+          </div>
+          <div class="usage-bar-wrap">
+            <div class="usage-bar-label"><span>Monthly volume</span><span>$1.2M / $5M</span></div>
+            <div class="usage-bar-track"><div class="usage-bar-fill" style="width:24%"></div></div>
+          </div>
+          <div class="usage-bar-wrap">
+            <div class="usage-bar-label"><span>API calls (30d)</span><span>8,420 / 50,000</span></div>
+            <div class="usage-bar-track"><div class="usage-bar-fill" style="width:17%"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Transactions tab -->
+    <div class="pamd-txn-body" id="pamd-txn-body">
+      <!-- Volume summary -->
+      <div class="pamd-vol-row">
+        <div class="pamd-vol-card">
+          <div class="pamd-vol-val">$125,400</div>
+          <div class="pamd-vol-label">Volume today</div>
+        </div>
+        <div class="pamd-vol-card">
+          <div class="pamd-vol-val">$1.2M</div>
+          <div class="pamd-vol-label">Volume this month</div>
+        </div>
+        <div class="pamd-vol-card">
+          <div class="pamd-vol-val">47</div>
+          <div class="pamd-vol-label">Transactions (30d)</div>
+        </div>
+      </div>
+      <!-- Filters -->
+      <div class="pamd-filters">
+        <select class="pamd-filter-select">
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+          <option>Today</option>
+          <option>Custom range</option>
+        </select>
+        <select class="pamd-filter-select">
+          <option>All statuses</option>
+          <option>Confirmed</option>
+          <option>Pending</option>
+          <option>Failed</option>
+        </select>
+        <select class="pamd-filter-select">
+          <option>All chains</option>
+          <option>Base</option>
+          <option>Ethereum</option>
+          <option>Polygon</option>
+          <option>Solana</option>
+        </select>
+        <button class="pa-add-btn" style="margin-left:auto">↓ Export CSV</button>
+      </div>
+      <!-- Transaction list -->
+      <div class="pamd-txn-table">
+        <div class="pamd-txn-thead">
+          <span class="pamd-txn-th">Tx ID</span>
+          <span class="pamd-txn-th">Date</span>
+          <span class="pamd-txn-th">Recipient</span>
+          <span class="pamd-txn-th">Amount</span>
+          <span class="pamd-txn-th">Chain</span>
+          <span class="pamd-txn-th">Status</span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_9f2a</span>
+          <span class="pamd-txn-cell">22 Mar · 14:32</span>
+          <span class="pamd-txn-cell">GlobalTech SG</span>
+          <span class="pamd-txn-amt">$25,000</span>
+          <span class="pamd-txn-cell">Base</span>
+          <span><div class="pamd-txn-status confirmed">Confirmed</div></span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_8e1b</span>
+          <span class="pamd-txn-cell">21 Mar · 09:14</span>
+          <span class="pamd-txn-cell">Meridian Logistics</span>
+          <span class="pamd-txn-amt">$18,200</span>
+          <span class="pamd-txn-cell">Polygon</span>
+          <span><div class="pamd-txn-status confirmed">Confirmed</div></span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_7c4d</span>
+          <span class="pamd-txn-cell">20 Mar · 17:55</span>
+          <span class="pamd-txn-cell">FastShip HK</span>
+          <span class="pamd-txn-amt">$6,500</span>
+          <span class="pamd-txn-cell">Solana</span>
+          <span><div class="pamd-txn-status confirmed">Confirmed</div></span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_6b3c</span>
+          <span class="pamd-txn-cell">20 Mar · 11:02</span>
+          <span class="pamd-txn-cell">Unknown address</span>
+          <span class="pamd-txn-amt">$3,800</span>
+          <span class="pamd-txn-cell">Base</span>
+          <span><div class="pamd-txn-status failed">Blocked</div></span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_5a2e</span>
+          <span class="pamd-txn-cell">19 Mar · 08:30</span>
+          <span class="pamd-txn-cell">TechSupply Dubai</span>
+          <span class="pamd-txn-amt">$41,000</span>
+          <span class="pamd-txn-cell">Ethereum</span>
+          <span><div class="pamd-txn-status confirmed">Confirmed</div></span>
+        </div>
+        <div class="pamd-txn-row">
+          <span class="pamd-txn-id">sp_tx_4f9a</span>
+          <span class="pamd-txn-cell">18 Mar · 15:10</span>
+          <span class="pamd-txn-cell">GlobalTech SG</span>
+          <span class="pamd-txn-amt">$31,700</span>
+          <span class="pamd-txn-cell">Base</span>
+          <span><div class="pamd-txn-status pending">Pending</div></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TOPBAR -->
+<div class="demo-topbar" id="demo-topbar">
+  <div class="demo-brand">
+    <div class="logo">Silent Pay</div>
+  </div>
+  <div class="demo-progress" id="demo-progress"></div>
+  <div class="demo-nav" id="demo-nav">
+    <span class="step-counter" id="step-counter"></span>
+    <button class="nav-btn nav-back" onclick="prevStep()" id="btn-back">← Back</button>
+    <button class="nav-btn nav-next" onclick="nextStep()" id="btn-next">Next →</button>
+  </div>
+  <div class="mode-toggle" id="mode-toggle">
+    <button class="mt-btn active" id="mt-tour" onclick="exitExplore()">Tour</button>
+    <button class="mt-btn" id="mt-explore" onclick="enterExplore()">Explore</button>
+  </div>
+</div>
+<div class="explore-bar" id="explore-bar" style="display:none">
+  <div class="explore-bar-label"><span class="explore-dot"></span>Explore mode — click any section in the sidebar</div>
+  <button class="explore-back" onclick="exitExplore()">← Back to guided tour</button>
+</div>
+
+<!-- SCREEN AREA -->
+<div class="screen-area">
+  <div class="device-frame" id="device">
+    <div class="spotlight-overlay" id="spotlight"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-brand"><div class="rp">Licensed PA</div><div class="rp-sub">Global Payments</div></div>
+      <div class="sb-entity"><div class="e-label">Business</div><div class="e-name">Acme Corp</div></div>
+      <nav class="sb-nav">
+        <div class="sb-label">Overview</div>
+        <div class="sb-item" id="nav-dash" onclick="sidebarNav('dashboard')"><span class="si">◫</span> Dashboard</div>
+        <div class="sb-label">Setup</div>
+        <div class="sb-item" id="nav-settings" onclick="sidebarNav('stablecoin')"><span class="si">⚙</span> Settings</div>
+        <div class="sb-item" id="nav-wallets" onclick="sidebarNav('wallets')"><span class="si">⊡</span> Wallets</div>
+        <div class="sb-item" id="nav-bene-mgr" onclick="sidebarNav('add-bene')"><span class="si">◎</span> Beneficiaries</div>
+        <div class="sb-label">Payments</div>
+        <div class="sb-item" id="nav-send" onclick="sidebarNav('bene')"><span class="si">↑</span> Send</div>
+        <div class="sb-item" id="nav-receive" onclick="sidebarNav('receive')"><span class="si">↓</span> Receive</div>
+        <div class="sb-item" id="nav-hist" onclick="sidebarNav('reports')"><span class="si">⇄</span> History</div>
+        <div class="sb-label">Platform</div>
+        <div class="sb-item" id="nav-reports" onclick="sidebarNav('reports')"><span class="si">◈</span> Reports</div>
+        <div class="sb-item" id="nav-policy" onclick="sidebarNav('policy')"><span class="si">⊛</span> Policy Rules</div>
+        <div class="sb-item" id="nav-audit" onclick="sidebarNav('audit')"><span class="si">≡</span> Audit Trail</div>
+        <div class="sb-label">Developer</div>
+        <div class="sb-item" id="nav-dev" onclick="sidebarNav('dev')"><span class="si">⌥</span> Webhooks & API</div>
+        <div class="sb-item" id="nav-notif" onclick="sidebarNav('notif')"><span class="si">◎</span> Notifications</div>
+        <div class="sb-label">Infrastructure</div>
+        <div class="sb-item" id="nav-gas" onclick="sidebarNav('gas')"><span class="si">⛽</span> Gas Station</div>
+        <div class="sb-item" id="nav-exc" onclick="sidebarNav('exc')"><span class="si">⇄</span> Exchanges</div>
+        <div class="sb-item" id="nav-mcurr" onclick="sidebarNav('mcurr')"><span class="si">◆</span> Currencies</div>
+      </nav>
+      <div class="sb-foot"><span class="live-dot"></span>Live · Powered by Silent Pay</div>
+    </div>
+
+    <!-- MAIN PANEL -->
+    <div class="main-panel">
+      <div class="topbar">
+        <div class="tb-left">Hi, <strong>Acme Corp</strong></div>
+        <div class="tb-right">
+          <span style="font-size:11px;color:var(--gray)">22 Mar 2026 · 14:20 IST</span>
+          <div class="avatar">AC</div>
+        </div>
+      </div>
+      <!-- Explore flow nav — shown in explore mode when a multi-step flow is active -->
+      <div class="explore-flow-nav" id="explore-flow-nav">
+        <span class="efn-label" id="efn-label">Send Payment</span>
+        <div class="efn-steps" id="efn-steps"></div>
+        <div class="efn-nav">
+          <button class="efn-btn" id="efn-prev" onclick="exploreFlowStep(-1)">← Prev</button>
+          <button class="efn-btn" id="efn-next" onclick="exploreFlowStep(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="content" id="view-dashboard" style="display:none">
+        <div class="balance-hero" id="balance-hero">
+          <div>
+            <div class="bh-label">Available Balance</div>
+            <div class="bh-amount">$50,000</div>
+            <div class="bh-sub">Available balance · 3 active wallets</div>
+          </div>
+          <div class="bh-actions">
+            <button class="bh-btn bh-btn-primary" id="send-btn">↑ Send</button>
+            <button class="bh-btn bh-btn-outline">↓ Receive</button>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="s-label">Sent (30d)</div><div class="s-val">$240,000</div><div class="s-sub green">↑ 18% vs last month</div></div>
+          <div class="stat"><div class="s-label">Avg. Settlement</div><div class="s-val">8 min</div><div class="s-sub green">vs 2–4 days (SWIFT)</div></div>
+          <div class="stat" id="stat-saved"><div class="s-label">Saved vs SWIFT</div><div class="s-val">$3,800</div><div class="s-sub">in fees this month</div></div>
+        </div>
+        <div class="tx-card">
+          <div class="tx-card-header"><h3>Recent Payments</h3><span class="badge badge-blue">Live</span></div>
+          <div class="tx-row"><div class="tx-icon in">↓</div><div class="tx-info"><div class="tx-name">Meridian Exports Dubai</div><div class="tx-meta">UAE → US · $18,400 · 11 min ago</div></div><div class="tx-amt"><div class="amt in">+$18,400</div><div class="date"><span class="badge badge-green">Complete</span></div></div></div>
+          <div class="tx-row"><div class="tx-icon out">↑</div><div class="tx-info"><div class="tx-name">SwiftPay DMCC</div><div class="tx-meta">US → UAE · $8,200 · 2h ago</div></div><div class="tx-amt"><div class="amt out">-$8,200</div><div class="date"><span class="badge badge-green">Complete</span></div></div></div>
+          <div class="tx-row"><div class="tx-icon pend">⏳</div><div class="tx-info"><div class="tx-name">NovaCom London Ltd</div><div class="tx-meta">US → UK · $12,500 · Yesterday</div></div><div class="tx-amt"><div class="amt out">-$12,500</div><div class="date"><span class="badge badge-amber">In Progress</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ===== FUND ACCOUNT ===== -->
+      <div class="send-view" id="view-fund">
+        <div class="page-title">Fund Your Account</div>
+        <div class="page-sub">Wire fiat to your PA's pool bank account — PA converts and credits your USD balance</div>
+
+        <div class="fund-flow-banner">
+          <div class="ffb-step"><div class="ffb-num">1</div><div class="ffb-label">You wire USD</div></div>
+          <div class="ffb-arrow">→</div>
+          <div class="ffb-step"><div class="ffb-num">2</div><div class="ffb-label">PA pool account receives</div></div>
+          <div class="ffb-arrow">→</div>
+          <div class="ffb-step"><div class="ffb-num">3</div><div class="ffb-label">PA buys USDC on exchange</div></div>
+          <div class="ffb-arrow">→</div>
+          <div class="ffb-step active"><div class="ffb-num">4</div><div class="ffb-label">USD balance credited</div></div>
+        </div>
+
+        <div class="fund-wire-card" id="fund-wire-card">
+          <div class="fwc-header">
+            <div class="fwc-title">Wire Transfer Instructions</div>
+            <span class="badge badge-blue">Your PA's pool account</span>
+          </div>
+          <div class="fwc-row"><span class="fwc-k">Bank name</span><span class="fwc-v">DBS Bank Singapore</span></div>
+          <div class="fwc-row"><span class="fwc-k">SWIFT / BIC</span><span class="fwc-v mono">DBSSSGSG</span></div>
+          <div class="fwc-row"><span class="fwc-k">Account number</span><span class="fwc-v mono">028-901847-4</span></div>
+          <div class="fwc-row"><span class="fwc-k">Account name</span><span class="fwc-v">Silent Pay Pte. Ltd. — Client Funds</span></div>
+          <div class="fwc-row highlight-row"><span class="fwc-k">Reference</span><span class="fwc-v mono ref-tag">ACME-CORP</span></div>
+          <div class="fwc-note">Always include your reference code. Wires without reference may be delayed.</div>
+        </div>
+
+        <div class="fund-deposits-card">
+          <div class="fdc-header">Recent Deposits</div>
+          <div class="fdc-row">
+            <div class="fdc-icon settled">✓</div>
+            <div class="fdc-info">
+              <div class="fdc-name">Wire from Acme Corp — First National Bank</div>
+              <div class="fdc-meta">Ref: ACME-CORP · 14 Mar 2026 · Settled in 1 business day</div>
+            </div>
+            <div class="fdc-amt">+$50,000</div>
+          </div>
+          <div class="fdc-row">
+            <div class="fdc-icon pending">⏳</div>
+            <div class="fdc-info">
+              <div class="fdc-name">Wire from Acme Corp — First National Bank</div>
+              <div class="fdc-meta">Ref: ACME-CORP · 21 Mar 2026 · Awaiting bank confirmation</div>
+            </div>
+            <div class="fdc-amt pending-amt">+$25,000</div>
+          </div>
+        </div>
+
+        <div class="fund-disclaimer">Funds are held in a segregated client account. Silent Pay does not commingle client funds.</div>
+      </div>
+
+      <!-- ===== STABLECOIN SETTINGS ===== -->
+      <div class="send-view" id="view-stablecoin">
+        <div class="page-title">Supported Stablecoins</div>
+        <div class="page-sub">All stablecoins available via your Licensed PA's exchange partners</div>
+
+        <!-- PA recommended toggle -->
+        <div class="pa-toggle-bar" id="pa-toggle-bar">
+          <div>
+            <div class="pa-toggle-label">Use PA-recommended stablecoins</div>
+            <div class="pa-toggle-sub">Auto-selects USDC + USDT — best liquidity across both exchange partners</div>
+          </div>
+          <div class="toggle-switch" id="pa-toggle" onclick="togglePARecommended()">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+
+        <!-- PA's connected exchanges -->
+        <div class="exc-bar" id="exc-bar">
+          <span class="exc-bar-label">PA exchanges</span>
+          <span class="exc-pill"><span class="ep-dot"></span>Coinbase Prime</span>
+          <span class="exc-pill"><span class="ep-dot"></span>Kraken</span>
+          <span class="exc-pill" style="background:var(--blue-light);color:var(--blue);cursor:pointer">+ Request exchange</span>
+        </div>
+
+        <!-- Full stablecoin list grouped by currency -->
+        <div class="sc-picker" id="sc-picker">
+
+          <!-- USD stablecoins -->
+          <div class="sc-group-head"><span class="sgh-flag">🇺🇸</span> USD Stablecoins</div>
+
+          <div class="sc-row sel" id="sc-usdc" onclick="toggleStable('sc-usdc')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#2775ca">USDC</div>
+              <div class="sc-info">
+                <div class="sc-name">USDC</div>
+                <div class="sc-issuer">Circle · $50B+ · Base, ETH, Solana +11</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag green">Coinbase Prime</span>
+                <span class="sc-src-tag green">Kraken</span>
+              </div>
+              <div style="font-size:9px;color:var(--green);margin-top:3px;text-align:right">2 sources · best rate</div>
+            </div>
+          </div>
+
+          <div class="sc-row sel" id="sc-usdt" onclick="toggleStable('sc-usdt')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#26a17b">USDT</div>
+              <div class="sc-info">
+                <div class="sc-name">USDT</div>
+                <div class="sc-issuer">Tether · $110B+ · ETH, Tron, Solana +8</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag green">Coinbase Prime</span>
+                <span class="sc-src-tag green">Kraken</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sc-row" id="sc-pyusd" onclick="toggleStable('sc-pyusd')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#003087">PYUSD</div>
+              <div class="sc-info">
+                <div class="sc-name">PYUSD</div>
+                <div class="sc-issuer">PayPal · $500M · ETH, Solana</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag amber">Coinbase Prime only</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- EUR stablecoins -->
+          <div class="sc-group-head"><span class="sgh-flag">🇪🇺</span> EUR Stablecoins</div>
+
+          <div class="sc-row" id="sc-eurc" onclick="toggleStable('sc-eurc')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#003399">EURC</div>
+              <div class="sc-info">
+                <div class="sc-name">EURC</div>
+                <div class="sc-issuer">Circle · EUR-backed · Base, ETH, Solana</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag green">Coinbase Prime</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sc-row" id="sc-eurt" onclick="toggleStable('sc-eurt')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#26a17b">EURT</div>
+              <div class="sc-info">
+                <div class="sc-name">EURT</div>
+                <div class="sc-issuer">Tether · EUR-backed · ETH, Tron</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag green">Kraken</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GBP stablecoins -->
+          <div class="sc-group-head"><span class="sgh-flag">🇬🇧</span> GBP Stablecoins</div>
+
+          <div class="sc-row" id="sc-gbpt" onclick="toggleStable('sc-gbpt')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#1a1a2e">GBPT</div>
+              <div class="sc-info">
+                <div class="sc-name">GBPT</div>
+                <div class="sc-issuer">Tether · GBP-backed · ETH</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag green">Kraken</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- JPY stablecoins -->
+          <div class="sc-group-head"><span class="sgh-flag">🇯🇵</span> JPY Stablecoins</div>
+
+          <div class="sc-row" id="sc-jpyc" onclick="toggleStable('sc-jpyc')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#bc002d">JPYC</div>
+              <div class="sc-info">
+                <div class="sc-name">JPYC</div>
+                <div class="sc-issuer">JPYC Inc · JPY-backed · ETH, Polygon</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag red">Not on PA's exchanges</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SGD stablecoins -->
+          <div class="sc-group-head"><span class="sgh-flag">🇸🇬</span> SGD Stablecoins</div>
+
+          <div class="sc-row" id="sc-xsgd" onclick="toggleStable('sc-xsgd')">
+            <div class="sc-cb"><span class="sc-cb-check">✓</span></div>
+            <div class="sc-row-left">
+              <div class="sc-ticker" style="background:#ef7f1a">XSGD</div>
+              <div class="sc-info">
+                <div class="sc-name">XSGD</div>
+                <div class="sc-issuer">StraitsX · SGD-backed · ETH, Polygon</div>
+              </div>
+            </div>
+            <div class="sc-row-right">
+              <div class="sc-sources-inline">
+                <span class="sc-src-tag red">Not on PA's exchanges</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /sc-picker -->
+
+        <div class="settings-note" id="sc-footer-note">PA-recommended selection active: <strong>USDC + USDT</strong>. Toggle off to customise. Stablecoins marked "not on PA's exchanges" require the PA to add a new exchange partner. <strong>You never onboard on any exchange directly.</strong></div>
+      </div>
+
+      <!-- ===== ALL SUPPORTED CHAINS ===== -->
+      <div class="send-view" id="view-chain">
+        <div class="page-title">Supported Chains</div>
+        <div class="page-sub">Your PA supports all of these — wallets created on every chain at onboarding</div>
+
+        <div class="chain-grid" id="chain-grid">
+          <div class="chain-card" id="cc-base">
+            <span class="sup-badge">PA default</span>
+            <div class="cc-name">Base</div>
+            <div class="cc-desc">Ethereum L2 · Coinbase-backed</div>
+            <div class="chain-stat"><span class="cs-k">Settlement</span><span class="cs-v green">~2 sec</span></div>
+            <div class="chain-stat"><span class="cs-k">Gas fee</span><span class="cs-v green">$0.01</span></div>
+            <div class="chain-stat"><span class="cs-k">Wallet type</span><span class="cs-v">EVM</span></div>
+          </div>
+          <div class="chain-card" id="cc-eth">
+            <div class="cc-name">Ethereum</div>
+            <div class="cc-desc">Mainnet · Most established</div>
+            <div class="chain-stat"><span class="cs-k">Settlement</span><span class="cs-v">~12 sec</span></div>
+            <div class="chain-stat"><span class="cs-k">Gas fee</span><span class="cs-v">$2–5</span></div>
+            <div class="chain-stat"><span class="cs-k">Wallet type</span><span class="cs-v">EVM (shared)</span></div>
+          </div>
+          <div class="chain-card" id="cc-sol">
+            <div class="cc-name">Solana</div>
+            <div class="cc-desc">High-throughput · Ultra-low fee</div>
+            <div class="chain-stat"><span class="cs-k">Settlement</span><span class="cs-v green">~0.4 sec</span></div>
+            <div class="chain-stat"><span class="cs-k">Gas fee</span><span class="cs-v green">$0.00025</span></div>
+            <div class="chain-stat"><span class="cs-k">Wallet type</span><span class="cs-v">Ed25519</span></div>
+          </div>
+          <div class="chain-card" id="cc-poly">
+            <div class="cc-name">Polygon</div>
+            <div class="cc-desc">EVM-compatible · Low gas</div>
+            <div class="chain-stat"><span class="cs-k">Settlement</span><span class="cs-v">~2 sec</span></div>
+            <div class="chain-stat"><span class="cs-k">Gas fee</span><span class="cs-v green">$0.01</span></div>
+            <div class="chain-stat"><span class="cs-k">Wallet type</span><span class="cs-v">EVM (shared)</span></div>
+          </div>
+          <div class="chain-card" id="cc-arb">
+            <div class="cc-name">Arbitrum</div>
+            <div class="cc-desc">Ethereum L2 · DeFi ecosystem</div>
+            <div class="chain-stat"><span class="cs-k">Settlement</span><span class="cs-v">~1 sec</span></div>
+            <div class="chain-stat"><span class="cs-k">Gas fee</span><span class="cs-v green">$0.02</span></div>
+            <div class="chain-stat"><span class="cs-k">Wallet type</span><span class="cs-v">EVM (shared)</span></div>
+          </div>
+          <div class="chain-card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:var(--gray-lighter)">
+            <div class="cc-name" style="color:var(--gray);font-size:12px">+ More</div>
+            <div class="cc-desc" style="margin-bottom:0">BNB, Optimism,<br>Avalanche, XRP…</div>
+          </div>
+        </div>
+
+        <!-- Proceed to wallet creation -->
+        <div class="chain-proceed" id="chain-proceed">
+          <div class="cp-left">
+            <div class="cp-title">Creating wallets on all 5+ chains</div>
+            <div class="cp-sub">$0 cost · ~1–2 seconds · no on-chain transactions</div>
+          </div>
+          <div class="cp-arrow">→</div>
+        </div>
+
+        <div class="settings-note">No selection needed here. <strong>Wallet creation is free and instant</strong> — it's pure cryptography, nothing goes on-chain. You choose which chain to route each payment on at transaction time.</div>
+      </div>
+
+      <!-- ===== WALLET CREATION ===== -->
+      <div class="send-view" id="view-wallets">
+        <div class="page-title">Wallet Creation</div>
+        <div class="page-sub">DKG running across all supported chains — 2 runs total</div>
+
+        <div class="mpc-info" id="mpc-info" style="margin-bottom:12px">
+          <div class="mpc-info-title-row">
+            <div class="mpc-info-title">Distributed Key Generation (DKG)</div>
+            <div class="mpc-computing" id="mpc-computing">⟳ Computing...</div>
+            <div class="mpc-done" id="mpc-done">✓ Complete</div>
+          </div>
+          <div class="mpc-row" id="mr1">
+            <div class="mpc-icon">Run 1</div>
+            <div>EVM DKG (secp256k1) — PA server + SGX #1 + SGX #2 each compute a key share</div>
+            <div class="mpc-status" id="ms1">waiting</div>
+          </div>
+          <div class="mpc-row" id="mr2">
+            <div class="mpc-icon">Output</div>
+            <div>EVM public key → <strong style="color:#60a5fa">one address for Base, ETH, Polygon, Arbitrum</strong></div>
+            <div class="mpc-status" id="ms2">waiting</div>
+          </div>
+          <div class="mpc-row" id="mr3">
+            <div class="mpc-icon">Run 2</div>
+            <div>Solana DKG (Ed25519) — separate curve, new 3-party computation</div>
+            <div class="mpc-status" id="ms3">waiting</div>
+          </div>
+          <div class="mpc-row" id="mr4">
+            <div class="mpc-icon">Output</div>
+            <div>Solana public key → <strong style="color:#60a5fa">unique Solana address</strong> · <strong style="color:#4ade80">private key never assembled in either run</strong></div>
+            <div class="mpc-status" id="ms4">waiting</div>
+          </div>
+        </div>
+
+        <!-- Wallet cards: EVM group + Solana -->
+        <div class="wallet-grid" id="wallet-grid">
+          <div class="wallet-card" id="wc-evm">
+            <div class="wc-left">
+              <div style="display:flex;gap:3px;flex-shrink:0">
+                <div class="wc-chain-badge" style="background:#2563eb;width:22px;height:22px;border-radius:5px;font-size:8px">B</div>
+                <div class="wc-chain-badge" style="background:#627eea;width:22px;height:22px;border-radius:5px;font-size:8px">E</div>
+                <div class="wc-chain-badge" style="background:#8247e5;width:22px;height:22px;border-radius:5px;font-size:8px">P</div>
+                <div class="wc-chain-badge" style="background:#2d374b;width:22px;height:22px;border-radius:5px;font-size:8px">A</div>
+              </div>
+              <div><div class="wc-name">EVM Chains</div><div class="wc-type">Base · ETH · Polygon · Arbitrum · shared address</div></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-addr">0x742d35Cc6634...8f21</div>
+              <div class="wc-status"><span class="badge badge-green">Active · 4 chains</span></div>
+            </div>
+          </div>
+          <div class="wallet-card" id="wc-sol">
+            <div class="wc-left">
+              <div class="wc-chain-badge" style="background:#9945ff">SOL</div>
+              <div><div class="wc-name">Solana</div><div class="wc-type">Ed25519 · separate DKG run</div></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-addr">7Kp3mNxQv4Rb...xQ9v</div>
+              <div class="wc-status"><span class="badge badge-green">Active</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ADD BENEFICIARY ===== -->
+      <div class="send-view" id="view-add-bene">
+        <div class="page-title">Add Beneficiary</div>
+        <div class="page-sub">How does this beneficiary want to receive payment?</div>
+
+        <!-- Step 1: Settlement type is the PRIMARY choice -->
+        <div class="settle-type-row">
+          <div class="settle-type-card sel" id="stype-fiat" onclick="selectSettleType('fiat')">
+            <div class="st-icon">💵</div>
+            <div class="st-label">Local fiat</div>
+            <div class="st-sub">Bank wire · local currency</div>
+          </div>
+          <div class="settle-type-card" id="stype-usdc" onclick="selectSettleType('usdc')">
+            <div class="st-icon">🔵</div>
+            <div class="st-label">Hold USDC</div>
+            <div class="st-sub">Delivered as stablecoin</div>
+          </div>
+          <div class="settle-type-card" id="stype-usdt" onclick="selectSettleType('usdt')">
+            <div class="st-icon">🟢</div>
+            <div class="st-label">Hold USDT</div>
+            <div class="st-sub">Delivered as Tether</div>
+          </div>
+        </div>
+
+        <!-- Fiat form: bank details -->
+        <div class="bene-subform" id="bene-form-fiat">
+          <div class="bene-form-row">
+            <div class="form-group"><label>Company name</label><input type="text" value="GlobalTech SG Pte Ltd" readonly></div>
+            <div class="form-group"><label>Country</label><input type="text" value="🇸🇬 Singapore" readonly></div>
+          </div>
+          <div class="bene-form-row">
+            <div class="form-group"><label>Bank name</label><input type="text" value="DBS Bank Singapore" readonly></div>
+            <div class="form-group"><label>Receives in</label><input type="text" value="SGD (local fiat)" readonly></div>
+          </div>
+          <div class="bene-form-row">
+            <div class="form-group"><label>SWIFT / BIC</label><input type="text" value="DBSSSGSG" readonly></div>
+            <div class="form-group"><label>Account number</label><input type="text" value="••••••4821" readonly></div>
+          </div>
+          <div class="verified-row" style="margin-top:6px">
+            <div><div class="vr-name">GlobalTech SG Pte Ltd</div><div class="vr-bank">DBS Bank · Singapore · SGD → local fiat wire</div></div>
+            <span class="badge badge-green">✓ Verified</span>
+          </div>
+          <div class="settings-note" style="margin-top:8px">PA converts USDC → SGD at destination. <strong>GlobalTech receives SGD in their bank account.</strong> They never hold or see crypto.</div>
+        </div>
+
+        <!-- Crypto form: wallet address only -->
+        <div class="bene-subform" id="bene-form-crypto" style="display:none">
+          <div class="crypto-settle-header">
+            <span class="crypto-settle-badge" id="crypto-settle-badge" style="background:#dbeafe;color:#1d4ed8">USDC · Circle</span>
+            <span style="font-size:11px;color:var(--gray)">Beneficiary's wallet address</span>
+          </div>
+          <div class="form-group full">
+            <label>Wallet address (any EVM chain)</label>
+            <input class="crypto-addr-input" type="text" value="0xAbC3...f7D2e9Fa" readonly>
+          </div>
+          <div class="form-group full" style="margin-top:8px">
+            <label>Chain preference</label>
+            <select><option>Base (recommended · $0.01 gas)</option><option>Ethereum</option><option>Polygon</option></select>
+          </div>
+          <div class="settings-note" style="margin-top:8px">USDC is delivered directly to this wallet. <strong>No fiat conversion.</strong> Beneficiary holds stablecoin and off-ramps on their own terms.</div>
+        </div>
+      </div>
+
+      <!-- ===== RECEIVE MONEY ===== -->
+      <div class="send-view" id="view-receive">
+        <div class="page-title">Receive Money</div>
+        <div class="page-sub">Create a payment request — share a link, get paid</div>
+
+        <!-- Select wallet to receive into -->
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:6px">Receive into wallet</div>
+        <div class="receive-wallet-row">
+          <div class="receive-wallet sel" id="rw-evm">
+            <div class="rw-label">EVM Wallet</div>
+            <div class="rw-addr">0x742d35Cc6634...8f21</div>
+            <div class="rw-chains">Base · ETH · Polygon · Arbitrum</div>
+          </div>
+          <div class="receive-wallet" id="rw-sol">
+            <div class="rw-label">Solana Wallet</div>
+            <div class="rw-addr">7Kp3mNxQv4Rb...xQ9v</div>
+            <div class="rw-chains">Solana</div>
+          </div>
+        </div>
+
+        <!-- Select currency to receive in -->
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:6px">Currency to receive</div>
+        <div class="receive-currency-row">
+          <div class="receive-currency sel" id="rc-usdc"><div class="rc-ticker">USDC</div><div class="rc-sub">Circle · USD</div></div>
+          <div class="receive-currency" id="rc-usdt"><div class="rc-ticker">USDT</div><div class="rc-sub">Tether · USD</div></div>
+          <div class="receive-currency" id="rc-eurc"><div class="rc-ticker">EURC</div><div class="rc-sub">Circle · EUR</div></div>
+        </div>
+
+        <!-- Amount (optional) -->
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--gray);margin-bottom:6px">Amount (optional)</div>
+        <input class="form-input" style="margin-bottom:10px" value="$25,000" readonly>
+
+        <!-- Generated link -->
+        <div class="generated-link-card" id="generated-link">
+          <div class="gl-title">✓ Payment link generated</div>
+          <div class="gl-url">pay.silentpay.io/req/acme-corp/8f2a1c?amt=25000&cur=USDC&chain=base</div>
+          <div class="gl-actions">
+            <button class="gl-btn gl-btn-copy">Copy link</button>
+            <button class="gl-btn gl-btn-open" onclick="goToPayerPage()">Preview payment page →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAYER CHECKOUT PAGE ===== -->
+      <div class="pipeline-view" id="view-payer">
+        <div class="payer-page">
+          <div class="pp-topbar"><span class="pp-lock">🔒</span> pay.silentpay.io · Secured by Silent Pay</div>
+          <div class="pp-card">
+            <div class="pp-header">
+              <div class="pp-from">Payment request from</div>
+              <div class="pp-company">Acme Corp</div>
+              <div class="pp-amount-big">$25,000</div>
+              <div class="pp-amount-sub">25,000 USDC · Base chain · Ref: INV-2026-0341</div>
+            </div>
+            <div class="pp-body">
+              <div class="pp-field">
+                <label>Your name</label>
+                <input type="text" value="James Chen" readonly>
+              </div>
+              <div class="pp-field">
+                <label>Company</label>
+                <input type="text" value="GlobalTech SG Pte Ltd" readonly>
+              </div>
+              <div class="pp-field">
+                <label>Pay from</label>
+                <select><option>Bank transfer (wire)</option><option>USDC wallet</option><option>USDT wallet</option></select>
+              </div>
+              <div class="pp-method-note">You will receive bank wire instructions after confirming. Funds convert to USDC automatically.</div>
+              <button class="pp-cta">Confirm & Pay $25,000 →</button>
+            </div>
+          </div>
+          <div class="pp-footer">Powered by <a>Silent Pay</a> · MPC-secured · Funds settle in ~8 min</div>
+        </div>
+      </div>
+
+      <!-- ===== SEND: BENE SELECTION ===== -->
+      <div class="send-view" id="view-bene">
+        <div class="page-title">Send Payment</div>
+        <div class="page-sub">Select beneficiary — settlement preference set at onboarding</div>
+        <div class="bene-row">
+          <div class="bene-card sel" id="bene-sg">
+            <div class="bene-name">GlobalTech SG Pte Ltd</div>
+            <div class="bene-bank">DBS Bank Singapore · SGD account</div>
+            <div class="bene-flag">🇸🇬 Singapore · <span class="badge badge-green" style="font-size:9px">Verified</span></div>
+            <div style="margin-top:6px"><span class="badge badge-green" style="font-size:9px">💵 Local fiat (SGD)</span></div>
+          </div>
+          <div class="bene-card" id="bene-uk">
+            <div class="bene-name">NovaCom London Ltd</div>
+            <div class="bene-bank">Barclays · GBP account</div>
+            <div class="bene-flag">🇬🇧 United Kingdom</div>
+            <div style="margin-top:6px"><span class="badge badge-green" style="font-size:9px">💵 Local fiat (GBP)</span></div>
+          </div>
+          <div class="bene-card" id="bene-uae">
+            <div class="bene-name">SwiftPay DMCC</div>
+            <div class="bene-bank">Emirates NBD · AED account</div>
+            <div class="bene-flag">🇦🇪 UAE</div>
+            <div style="margin-top:6px"><span class="badge badge-blue" style="font-size:9px">🪙 Hold USDC</span></div>
+          </div>
+          <div class="bene-card">
+            <div class="bene-name" style="color:var(--blue)">+ Add New</div>
+            <div class="bene-bank">Any bank · 150+ countries</div>
+            <div class="bene-flag">🌏 Set settlement preference</div>
+            <div style="margin-top:6px"><span class="badge badge-gray" style="font-size:9px">Fiat / USDC / USDT</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEND: AMOUNT ===== -->
+      <div class="send-view" id="view-amount">
+        <div class="page-title">Send to GlobalTech SG</div>
+        <div class="page-sub">🇸🇬 Singapore · DBS Bank · Settlement: Local fiat (SGD)</div>
+        <div class="amount-form" id="amount-form">
+          <div class="form-label">You send (USD)</div>
+          <input class="form-input" value="$25,000" readonly>
+          <div class="arrow-mid">↕</div>
+          <div class="fx-display" id="fx-display">
+            <div class="fx-amount">25,000 USDC</div>
+            <div class="fx-sub" id="fx-sub-text">1 USD = 1.0000 USDC · Stablecoin peg · Live Coinbase rate</div>
+          </div>
+          <div class="form-label" style="margin-top:10px">They receive (SGD)</div>
+          <input class="form-input" id="sgd-output" value="SGD 33,750" readonly style="background:var(--gray-lighter)">
+          <div class="stable-note">🪙 Moving as <strong>USDC on Base</strong> · Your default settings · <span style="color:#1d4ed8;cursor:pointer">Change</span></div>
+        </div>
+      </div>
+
+      <!-- ===== FX RATE (Coinbase Live) ===== -->
+      <div class="send-view" id="view-fx">
+        <div class="page-title">Live Exchange Rate</div>
+        <div class="page-sub">Sourced from Coinbase · $25,000 USD</div>
+
+        <div class="fx-loading" id="fx-loading">
+          <div style="font-size:13px;font-weight:600;color:var(--navy)">Fetching live rates from Coinbase...</div>
+          <div style="font-size:11px;color:var(--gray)">Coinbase Advanced Trade API · USD exchange rates</div>
+          <div class="fx-loading-bar"><div class="fx-loading-fill" id="fx-bar"></div></div>
+        </div>
+
+        <div id="fx-rate-card" style="display:none">
+          <!-- Step 1: USD → USDC -->
+          <div class="fx-step-row">
+            <div class="fx-step-label">Step 1 · USD → USDC (on-ramp)</div>
+            <div class="fx-step-head">
+              <div>
+                <div class="fx-step-rate">1 USD = <span id="usdc-rate">1.0000</span> USDC</div>
+                <div class="fx-step-calc">$25,000 → <span id="usdc-amt">25,000 USDC</span></div>
+              </div>
+              <span class="badge badge-green" style="padding:5px 10px;font-size:10px">Stablecoin peg · 1:1 always</span>
+            </div>
+          </div>
+
+          <!-- Step 2: USDC → SGD -->
+          <div class="fx-step-row">
+            <div class="fx-step-label">Step 2 · USDC → SGD (at destination · PA local rails)</div>
+            <div class="fx-step-head">
+              <div>
+                <div class="fx-step-rate">1 USD = <span id="sgd-rate">1.3512</span> SGD</div>
+                <div class="fx-step-calc">25,000 USDC → <span id="sgd-amt">SGD 33,780</span></div>
+              </div>
+              <span class="badge badge-blue" style="padding:5px 10px;font-size:10px">📡 Live · Coinbase</span>
+            </div>
+          </div>
+
+          <div class="settings-note">Rates sourced from <strong>Coinbase Advanced Trade API</strong> · Updated in real-time · Rate locked for 30 seconds on confirmation. GlobalTech SG sees <strong>SGD only</strong> — no crypto exposure.</div>
+        </div>
+      </div>
+
+      <!-- ===== SEND: REVIEW ===== -->
+      <div class="send-view" id="view-review">
+        <div class="page-title">Review Payment</div>
+        <div class="page-sub">To GlobalTech SG · Singapore</div>
+        <div class="review-card">
+          <div class="review-row"><span class="r-label">To</span><span class="r-val">GlobalTech SG Pte Ltd · DBS Bank</span></div>
+          <div class="review-row"><span class="r-label">Stablecoin / chain</span><span class="r-val">USDC on Base</span></div>
+          <div class="review-row"><span class="r-label">You send</span><span class="r-val">$25,000</span></div>
+          <div class="review-row"><span class="r-label">They receive</span><span class="r-val blue">SGD 33,750 (local fiat)</span></div>
+          <div class="review-row"><span class="r-label">FX rate</span><span class="r-val">1 USD = 1.35 SGD · Coinbase live</span></div>
+          <div class="review-row"><span class="r-label">Settlement</span><span class="r-val">~8 minutes</span></div>
+        </div>
+        <div class="review-card">
+          <table class="fee-table">
+            <tr><td>Transfer amount</td><td>$25,000.00</td></tr>
+            <tr><td>PA fee (0.3%)</td><td>$75.00</td></tr>
+            <tr><td>FX spread (0.4%)</td><td>$100.00</td></tr>
+            <tr><td>Base network fee</td><td>$0.01</td></tr>
+            <tr class="total"><td>Total debit</td><td>$25,175.01</td></tr>
+          </table>
+          <div class="savings-note">💡 SWIFT equivalent: ~$25,660 (2.5% FX + $35 fee). You save <strong>$485</strong> on this transfer.</div>
+        </div>
+        <button class="btn-primary">Confirm & Send →</button>
+      </div>
+
+      <!-- ===== PIPELINE ===== -->
+      <div class="pipeline-view" id="view-pipeline">
+        <div class="pl-header">
+          <div><div class="pl-title">Payment Sent</div><div class="pl-sub">Ref: PAY-20260322-8f2a1 · Tracking live</div></div>
+          <span class="pl-badge" id="pl-badge" style="background:var(--blue-light);color:var(--blue)">Processing</span>
+        </div>
+        <div class="pl-steps">
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot done">✓</div><div class="ps-line done"></div></div><div class="ps-body"><div class="ps-title">Payment initiated</div><div class="ps-desc">$25,000 debited · instruction verified</div><div class="ps-time">14:22:01</div></div></div>
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot" id="pd2">2</div><div class="ps-line" id="pl2"></div></div><div class="ps-body"><div class="ps-title">USD → USDC on Coinbase</div><div class="ps-desc">$25,000 → 25,000 USDC at 1:1 (stablecoin peg)</div><div class="ps-time" id="pt2">Waiting...</div></div></div>
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot" id="pd3">3</div><div class="ps-line" id="pl3"></div></div><div class="ps-body"><div class="ps-title">USDC on Base chain</div><div class="ps-desc">25,000 USDC → beneficiary wallet</div><div class="ps-chip">0x9f2a...4d8e → 0x742d...8f21</div><div class="ps-time" id="pt3">Waiting...</div></div></div>
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot" id="pd4">4</div><div class="ps-line" id="pl4"></div></div><div class="ps-body"><div class="ps-title">USDC → SGD at Coinbase SG</div><div class="ps-desc">25,000 USDC → SGD 33,750</div><div class="ps-time" id="pt4">Waiting...</div></div></div>
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot" id="pd5">5</div><div class="ps-line" id="pl5"></div></div><div class="ps-body"><div class="ps-title">SGD wired to DBS Singapore</div><div class="ps-desc">SGD 33,750 → GlobalTech DBS ••4821</div><div class="ps-time" id="pt5">Waiting...</div></div></div>
+          <div class="pl-step"><div class="ps-col"><div class="ps-dot" id="pd6">✓</div></div><div class="ps-body"><div class="ps-title" id="pt6-title">Payment complete</div><div class="ps-time" id="pt6">Waiting...</div></div></div>
+        </div>
+        <div class="uth" id="uth-panel">
+          <div class="uth-title">Behind the scenes</div>
+          <div class="uth-row"><div class="uth-actor">Licensed PA</div><div class="uth-action">Buys USDC on exchange · <span class="uth-api">Coinbase API</span></div></div>
+          <div class="uth-row"><div class="uth-actor">Licensed PA</div><div class="uth-action">Moves USDC to MPC vault · <span class="uth-api">POST /v1/transactions (Silent Pay)</span></div></div>
+          <div class="uth-row"><div class="uth-actor">Silent Pay</div><div class="uth-action">3-of-3 MPC sign → broadcast on Base · key never assembled</div></div>
+          <div class="uth-row"><div class="uth-actor">PA local entity</div><div class="uth-action">USDC → SGD conversion + bank wire via local rails</div></div>
+        </div>
+      </div>
+
+      <!-- ===== COMPLETE ===== -->
+      <div class="complete-view" id="view-complete">
+        <div class="complete-hero"><div class="ch-icon">✓</div><div class="ch-title">Payment Delivered</div><div class="ch-sub">SGD 33,750 credited to GlobalTech SG · DBS Bank Singapore · 8 min 12 sec</div></div>
+        <div class="compare-grid">
+          <div class="compare-card winner">
+            <div class="cc-label green">✓ Licensed PA (Silent Pay)</div>
+            <div class="compare-row"><span class="cr-key">Settlement</span><span class="cr-val green">8 min 12 sec</span></div>
+            <div class="compare-row"><span class="cr-key">Total fee</span><span class="cr-val green">0.7% ($175)</span></div>
+            <div class="compare-row"><span class="cr-key">Tracking</span><span class="cr-val green">Real-time</span></div>
+            <div class="compare-row"><span class="cr-key">Stablecoin</span><span class="cr-val green">USDC on Base</span></div>
+            <div class="compare-row"><span class="cr-key">Beneficiary gets</span><span class="cr-val green">SGD (local fiat)</span></div>
+          </div>
+          <div class="compare-card">
+            <div class="cc-label gray">✗ Traditional SWIFT</div>
+            <div class="compare-row"><span class="cr-key">Settlement</span><span class="cr-val red">2–4 business days</span></div>
+            <div class="compare-row"><span class="cr-key">Total fee</span><span class="cr-val red">2.5–3.5% + $35</span></div>
+            <div class="compare-row"><span class="cr-key">Tracking</span><span class="cr-val red">None</span></div>
+            <div class="compare-row"><span class="cr-key">Stablecoin</span><span class="cr-val red">N/A</span></div>
+            <div class="compare-row"><span class="cr-key">Failure risk</span><span class="cr-val red">3–5% rejection</span></div>
+          </div>
+        </div>
+        <div class="savings-big"><div class="sb-num">$485 saved</div><div class="sb-label-txt">on this transaction · 96% faster · USDC on Base chain · beneficiary received SGD</div></div>
+      </div>
+
+      <!-- ===== REPORTS ===== -->
+      <div class="send-view" id="view-reports">
+        <div class="page-title">Reports</div>
+        <div class="page-sub">Transaction history, savings, and FX cost analysis</div>
+        <div class="rpt-summary-row">
+          <div class="rpt-stat"><div class="rpt-stat-val">$284,200</div><div class="rpt-stat-lbl">Total sent · Mar 2026</div></div>
+          <div class="rpt-stat"><div class="rpt-stat-val green">$2,841</div><div class="rpt-stat-lbl">Saved vs SWIFT · this month</div></div>
+          <div class="rpt-stat"><div class="rpt-stat-val">18</div><div class="rpt-stat-lbl">Transactions · avg 9 min</div></div>
+        </div>
+        <div class="rpt-filters">
+          <button class="rpt-filter active">All</button>
+          <button class="rpt-filter">Completed</button>
+          <button class="rpt-filter">Pending</button>
+          <button class="rpt-filter">Failed</button>
+          <button class="rpt-filter">Mar 2026</button>
+        </div>
+        <div class="rpt-table" id="rpt-txn-table">
+          <div class="rpt-thead"><span class="rpt-th">Beneficiary</span><span class="rpt-th">Amount</span><span class="rpt-th">Chain</span><span class="rpt-th">Fee</span><span class="rpt-th">Status</span></div>
+          <div class="rpt-row"><div><div class="rpt-bene">GlobalTech SG</div><div class="rpt-meta">21 Mar · SGD settlement</div></div><span class="rpt-cell">$25,000</span><span class="rpt-cell">Base</span><span class="rpt-cell">$175</span><span class="badge badge-green">Done</span></div>
+          <div class="rpt-row"><div><div class="rpt-bene">SwiftPay DMCC</div><div class="rpt-meta">18 Mar · USDC hold</div></div><span class="rpt-cell">$8,200</span><span class="rpt-cell">Polygon</span><span class="rpt-cell">$57</span><span class="badge badge-green">Done</span></div>
+          <div class="rpt-row"><div><div class="rpt-bene">NovaCom London</div><div class="rpt-meta">17 Mar · GBP settlement</div></div><span class="rpt-cell">$12,500</span><span class="rpt-cell">Base</span><span class="rpt-cell">$87</span><span class="badge badge-amber">Pending</span></div>
+          <div class="rpt-row"><div><div class="rpt-bene">Meridian Dubai</div><div class="rpt-meta">14 Mar · AED settlement</div></div><span class="rpt-cell">$18,400</span><span class="rpt-cell">Arbitrum</span><span class="rpt-cell">$129</span><span class="badge badge-green">Done</span></div>
+          <div class="rpt-row"><div><div class="rpt-bene">Apex Logistics JP</div><div class="rpt-meta">10 Mar · JPY settlement</div></div><span class="rpt-cell">$31,000</span><span class="rpt-cell">Base</span><span class="rpt-cell">$217</span><span class="badge badge-green">Done</span></div>
+        </div>
+        <div class="rpt-export"><button class="rpt-export-btn">↓ Export CSV</button></div>
+        <div class="savings-banner" id="savings-banner" style="margin-top:12px">
+          <div class="sv-title">Q1 2026 — Savings vs SWIFT</div>
+          <div class="sv-amount">$8,240 saved</div>
+          <div class="sv-sub">Across 54 transactions · avg 0.7% fee vs 2.8% SWIFT</div>
+          <div class="sv-grid">
+            <div class="sv-cell"><div class="sv-cell-val">54</div><div class="sv-cell-lbl">Transactions</div></div>
+            <div class="sv-cell"><div class="sv-cell-val">9 min</div><div class="sv-cell-lbl">Avg settlement</div></div>
+            <div class="sv-cell"><div class="sv-cell-val">12 countries</div><div class="sv-cell-lbl">Corridors</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== POLICY ENGINE ===== -->
+      <div class="send-view" id="view-policy" style="position:relative">
+        <div class="policy-toolbar">
+          <div><div class="page-title" style="margin:0">Policy Rules</div><div class="page-sub" style="margin:0">Transaction Authorization · 6 active rules</div></div>
+        </div>
+
+        <!-- WORKSPACE POLICY -->
+        <div class="policy-section-header">
+          <div class="policy-section-toolbar">
+            <div>
+              <div class="policy-section-title">Workspace Policy</div>
+              <div class="policy-section-sub">Apply to all wallets and transactions across this workspace</div>
+            </div>
+            <button class="policy-add-btn" onclick="openPolicyModal()">+ Add Rule</button>
+          </div>
+        </div>
+        <div class="policy-list">
+          <div class="policy-rule active">
+            <div class="pr-top"><span class="pr-name">Whitelist-only external transfers</span><span class="pr-badge block">Block</span></div>
+            <div class="pr-desc">Block all outbound transfers to external addresses not on the approved whitelist. Applies workspace-wide.</div>
+            <div class="pr-chips"><span class="pr-chip">scope: all wallets</span><span class="pr-chip">destination: external</span><span class="pr-chip">not whitelisted</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+          <div class="policy-rule active">
+            <div class="pr-top"><span class="pr-name">New address hold</span><span class="pr-badge approve">Require Approval</span></div>
+            <div class="pr-desc">24-hour delay on first transfer to any new external address. Admin can override.</div>
+            <div class="pr-chips"><span class="pr-chip">scope: all wallets</span><span class="pr-chip">first-time address</span><span class="pr-chip">24h hold</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+          <div class="policy-rule active">
+            <div class="pr-top"><span class="pr-name">Velocity cap</span><span class="pr-badge block">Block</span></div>
+            <div class="pr-desc">Maximum 20 transactions per hour across all vaults. Resets automatically.</div>
+            <div class="pr-chips"><span class="pr-chip">scope: all wallets</span><span class="pr-chip">20 tx/hour</span><span class="pr-chip">auto-reset</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+          <div class="policy-rule active">
+            <div class="pr-top"><span class="pr-name">Business hours only</span><span class="pr-badge block">Block</span></div>
+            <div class="pr-desc">No outbound transfers outside 08:00–22:00 local time. Emergency override requires admin approval.</div>
+            <div class="pr-chips"><span class="pr-chip">scope: all wallets</span><span class="pr-chip">08:00–22:00</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+        </div>
+
+        <!-- WALLET-SPECIFIC POLICY -->
+        <div class="policy-section-header" style="margin-top:16px">
+          <div class="policy-section-toolbar">
+            <div>
+              <div class="policy-section-title">Wallet-Specific Policy</div>
+              <div class="policy-section-sub">Override or extend workspace rules for individual wallets</div>
+            </div>
+            <button class="policy-add-btn" onclick="openPolicyModal()">+ Add Rule</button>
+          </div>
+        </div>
+        <div class="policy-list">
+          <div class="policy-rule active">
+            <div class="pr-top">
+              <div style="display:flex;align-items:center"><span class="pr-vault-tag">EVM Wallet</span><span class="pr-name">Large transfer approval</span></div>
+              <span class="pr-badge approve">Require Approval</span>
+            </div>
+            <div class="pr-desc">Any outbound transaction above $50,000 from the EVM Wallet (Base · ETH · Polygon · Arbitrum) requires 2-of-3 admin approval before broadcast.</div>
+            <div class="pr-chips"><span class="pr-chip">amount &gt; $50,000</span><span class="pr-chip">2-of-3 quorum</span><span class="pr-chip">chains: EVM</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+          <div class="policy-rule active">
+            <div class="pr-top">
+              <div style="display:flex;align-items:center"><span class="pr-vault-tag">Solana Wallet</span><span class="pr-name">Auto-approve under $5K</span></div>
+              <span class="pr-badge allow">Allow</span>
+            </div>
+            <div class="pr-desc">Transactions below $5,000 from the Solana Wallet are auto-approved by API Co-Signer. No human sign-off required. Threshold is lower to match Solana's faster finality.</div>
+            <div class="pr-chips"><span class="pr-chip">amount &lt; $5,000</span><span class="pr-chip">chain: Solana</span><span class="pr-chip">co-signer: auto</span></div>
+            <div class="pr-actions"><button class="pr-edit-btn" onclick="openPolicyModal()">Edit</button><button class="pr-del-btn">Delete</button></div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="policy-modal" id="policy-modal">
+          <div class="pm-card">
+            <div class="pm-title">Edit Rule — Large transfer approval</div>
+            <div class="pm-field"><label>Rule name</label><input value="Large transfer approval"></div>
+            <div class="pm-field"><label>Trigger condition</label><select><option>Amount exceeds threshold</option><option>New external address</option><option>Velocity limit</option><option>Time window</option></select></div>
+            <div class="pm-field"><label>Threshold amount (USD)</label><input value="50000"></div>
+            <div class="pm-field"><label>Action</label><select><option>Require approval</option><option>Block</option><option>Allow</option></select></div>
+            <div class="pm-field"><label>Approvers required</label><select><option>2-of-3 admins</option><option>1-of-2 admins</option><option>Any admin</option></select></div>
+            <div class="pm-btns"><button class="pm-save" onclick="closePolicyModal()">Save Rule</button><button class="pm-cancel" onclick="closePolicyModal()">Cancel</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== AUDIT TRAIL ===== -->
+      <div class="send-view" id="view-audit">
+        <div class="page-title">Audit Trail</div>
+        <div class="page-sub">Every action logged · SOC 2 ready · 90-day retention</div>
+        <div class="audit-filters">
+          <button class="rpt-filter active">All events</button>
+          <button class="rpt-filter">Transactions</button>
+          <button class="rpt-filter">Policy</button>
+          <button class="rpt-filter">Auth</button>
+        </div>
+        <div class="audit-table">
+          <div class="audit-thead"><span class="rpt-th">Time</span><span class="rpt-th">Action</span><span class="rpt-th">Actor</span><span class="rpt-th">Result</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:32</span><span class="audit-action">transaction.confirmed · $25,000 → GlobalTech SG</span><span class="audit-actor">API key sp_live_***4f2a</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:31</span><span class="audit-action">policy.evaluated · amount $25,000 · rule: large-transfer</span><span class="audit-actor">Silent Pay engine</span><span class="audit-result ok">PASS</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:30</span><span class="audit-action">transaction.created · vault → GlobalTech SG</span><span class="audit-actor">api/acme-corp</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 09:14</span><span class="audit-action">policy.rule_updated · velocity-limit threshold 20→25</span><span class="audit-actor">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">20 Mar 18:02</span><span class="audit-action">transaction.blocked · destination not whitelisted</span><span class="audit-actor">API key sp_live_***4f2a</span><span class="audit-result blocked">BLOCKED</span></div>
+          <div class="audit-row"><span class="audit-ts">20 Mar 11:45</span><span class="audit-action">api_key.created · Production key for CI/CD</span><span class="audit-actor">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">19 Mar 08:30</span><span class="audit-action">vault.deposit_detected · +$50,000 USDC · Base</span><span class="audit-actor">Silent Pay engine</span><span class="audit-result ok">OK</span></div>
+        </div>
+        <div class="rpt-export" style="margin-top:10px"><button class="rpt-export-btn">↓ Export Audit Log</button></div>
+      </div>
+
+      <!-- ===== WEBHOOKS & API KEYS ===== -->
+      <div class="send-view" id="view-dev">
+        <div class="page-title">Developer</div>
+        <div class="page-sub">Webhooks, API keys, and notification settings</div>
+        <div class="dev-tabs">
+          <div class="dev-tab active" id="dtab-wh" onclick="switchDevTab('wh')">Webhooks</div>
+          <div class="dev-tab" id="dtab-api" onclick="switchDevTab('api')">API Keys</div>
+        </div>
+        <div id="dev-panel-wh">
+          <div class="wh-endpoint-card">
+            <div class="wh-url">https://api.acmecorp.com/silent-pay/webhooks</div>
+            <div class="wh-events">
+              <span class="wh-evt">transaction.completed</span>
+              <span class="wh-evt">transaction.failed</span>
+              <span class="wh-evt">vault.deposit_detected</span>
+              <span class="wh-evt">policy.approval_required</span>
+            </div>
+            <div class="wh-log">
+              <div class="wh-log-title">Recent deliveries</div>
+              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">transaction.completed</span><span class="wh-ts">14:32 today</span></div>
+              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">vault.deposit_detected</span><span class="wh-ts">09:01 today</span></div>
+              <div class="wh-log-row"><span class="wh-status err">503</span><span class="wh-event-name">transaction.failed</span><span class="wh-ts">20 Mar 18:02</span><button class="wh-retry-btn">Retry</button></div>
+              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">policy.approval_required</span><span class="wh-ts">20 Mar 14:15</span></div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--gray);margin-top:6px">HMAC-SHA256 signature verification · exponential backoff retry · 24h resend window</div>
+        </div>
+        <div id="dev-panel-api" style="display:none">
+          <div class="apikey-row">
+            <div class="ak-top"><span class="ak-name">Production — CI/CD pipeline</span><span class="ak-env prod">Production</span></div>
+            <div class="ak-key">sp_live_4f2a••••••••••••••••••••••••••••••••</div>
+            <div class="ak-meta">Created 20 Mar 2026 · Last used 14:32 today</div>
+          </div>
+          <div class="apikey-row">
+            <div class="ak-top"><span class="ak-name">Sandbox — Integration testing</span><span class="ak-env sandbox">Sandbox</span></div>
+            <div class="ak-key">sp_test_8c1d••••••••••••••••••••••••••••••••</div>
+            <div class="ak-meta">Created 15 Mar 2026 · Last used 2 days ago</div>
+            <button class="ak-revoke">Revoke</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NOTIFICATIONS ===== -->
+      <div class="send-view" id="view-notif">
+        <div class="page-title">Notifications</div>
+        <div class="page-sub">Configure email and mobile alerts for payment events</div>
+        <div class="notif-section">
+          <div class="notif-title">Email — finance@acmecorp.com</div>
+          <div class="notif-row"><div><div class="notif-label">Payment completed</div><div class="notif-sub">Sent when a transfer settles successfully</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Payment failed</div><div class="notif-sub">Sent immediately on failure with retry link</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Approval required</div><div class="notif-sub">Policy rule triggered — action needed</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Funds received</div><div class="notif-sub">Wallet deposit detected</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Daily summary</div><div class="notif-sub">End-of-day digest: volume, fees, pending</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+        <div class="notif-section">
+          <div class="notif-title">Mobile push — iOS app</div>
+          <div class="notif-row"><div><div class="notif-label">Payment completed</div><div class="notif-sub">Instant push on settlement</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Approval required</div><div class="notif-sub">Push + lock screen alert</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="notif-row"><div><div class="notif-label">Low balance alert</div><div class="notif-sub">When vault balance drops below $5,000</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+        <div class="notif-row" style="background:var(--blue-light);border-color:#bfdbfe"><div><div class="notif-label" style="color:var(--blue)">Webhook retry failure</div><div class="notif-sub">Email if webhook endpoint returns 5xx 3× in a row</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+      </div>
+
+      <!-- ===== GAS STATION ===== -->
+      <div class="send-view" id="view-gas">
+        <div class="page-title">Gas Station</div>
+        <div class="page-sub">Automatic gas top-up — merchants never hold ETH to send USDC</div>
+        <div class="gas-chain-grid" id="gas-chain-grid">
+          <div class="gas-card">
+            <div class="gas-chain-name">Base</div>
+            <div class="gas-bar-wrap"><div class="gas-bar" style="width:72%"></div></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.042 ETH</span></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
+          </div>
+          <div class="gas-card">
+            <div class="gas-chain-name">Ethereum</div>
+            <div class="gas-bar-wrap"><div class="gas-bar" style="width:38%"></div></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.019 ETH</span></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.01 ETH</span></div>
+          </div>
+          <div class="gas-card">
+            <div class="gas-chain-name">Polygon</div>
+            <div class="gas-bar-wrap"><div class="gas-bar" style="width:85%"></div></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">24.8 MATIC</span></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">2 MATIC</span></div>
+          </div>
+          <div class="gas-card">
+            <div class="gas-chain-name">Arbitrum</div>
+            <div class="gas-bar-wrap"><div class="gas-bar warn" style="width:18%"></div></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.004 ETH</span></div>
+            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
+          </div>
+        </div>
+        <div style="background:var(--amber-bg);border:1px solid #fcd34d;border-radius:7px;padding:9px 12px;font-size:11px;color:#92400e;margin-bottom:10px">⚠ Arbitrum reserve below threshold. Auto top-up queued.</div>
+        <div style="background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:12px 14px">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">Global settings</div>
+          <div class="gas-stat-row" style="margin-bottom:5px"><span class="gas-stat-lbl" style="font-size:11px">Max gas price cap</span><span class="gas-stat-val">50 gwei</span></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl" style="font-size:11px">Top-up source vault</span><span class="gas-stat-val">Master Vault · Acme Corp</span></div>
+        </div>
+      </div>
+
+      <!-- ===== EXCHANGE CONNECTIVITY ===== -->
+      <div class="send-view" id="view-exc">
+        <div class="page-title">Exchange Connectivity</div>
+        <div class="page-sub">PA-managed exchange accounts · BYOK available for enterprise</div>
+        <div class="exc-conn-card">
+          <div class="exc-conn-top">
+            <span class="exc-conn-name">Coinbase Prime</span>
+            <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 2 min ago</span>
+          </div>
+          <div class="exc-balances">
+            <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$142,800</div></div>
+            <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$38,400</div></div>
+            <div class="exc-bal-item"><div class="exc-bal-symbol">PYUSD</div><div class="exc-bal-amount">$12,000</div></div>
+          </div>
+          <div class="exc-meta">Supported stablecoins: USDC, USDT, PYUSD, EURC · API key: cb_prime_***9a4c</div>
+        </div>
+        <div class="exc-conn-card">
+          <div class="exc-conn-top">
+            <span class="exc-conn-name">Kraken</span>
+            <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 5 min ago</span>
+          </div>
+          <div class="exc-balances">
+            <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$89,200</div></div>
+            <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$54,100</div></div>
+            <div class="exc-bal-item"><div class="exc-bal-symbol">EURT</div><div class="exc-bal-amount">€18,500</div></div>
+          </div>
+          <div class="exc-meta">Supported stablecoins: USDC, USDT, EURT · API key: kr_***7f1d</div>
+        </div>
+        <div style="background:var(--blue-light);border:1px solid #bfdbfe;border-radius:7px;padding:9px 12px;font-size:11px;color:var(--blue)">Enterprise clients can connect their own exchange accounts (BYOK). Contact your PA for activation.</div>
+      </div>
+
+      <!-- ===== MULTI-CURRENCY ===== -->
+      <div class="send-view" id="view-mcurr">
+        <div class="page-title">Currency Balances</div>
+        <div class="page-sub">Live stablecoin balances across all wallets and chains</div>
+        <div class="mcurr-alloc-bar" style="margin-bottom:12px;border-radius:4px">
+          <div class="mcurr-alloc-seg" style="width:52%;background:#2563eb"></div>
+          <div class="mcurr-alloc-seg" style="width:28%;background:#16a34a"></div>
+          <div class="mcurr-alloc-seg" style="width:12%;background:#d97706"></div>
+          <div class="mcurr-alloc-seg" style="width:8%;background:#7c3aed"></div>
+        </div>
+        <div class="mcurr-grid">
+          <div class="mcurr-card">
+            <div class="mcurr-top"><span class="mcurr-symbol">USDC</span><span class="mcurr-chain">Base · ETH · Polygon</span></div>
+            <div class="mcurr-amount">$52,400</div>
+            <div class="mcurr-usd">≈ $52,400 USD · 52% of portfolio</div>
+            <div class="mcurr-change pos" style="margin-top:4px">+$25,000 today</div>
+          </div>
+          <div class="mcurr-card">
+            <div class="mcurr-top"><span class="mcurr-symbol">USDT</span><span class="mcurr-chain">Base · Polygon</span></div>
+            <div class="mcurr-amount">$28,100</div>
+            <div class="mcurr-usd">≈ $28,100 USD · 28% of portfolio</div>
+            <div class="mcurr-change neg" style="margin-top:4px">-$8,200 today</div>
+          </div>
+          <div class="mcurr-card">
+            <div class="mcurr-top"><span class="mcurr-symbol">EURC</span><span class="mcurr-chain">Base</span></div>
+            <div class="mcurr-amount">€11,200</div>
+            <div class="mcurr-usd">≈ $12,040 USD · 12% of portfolio</div>
+            <div class="mcurr-change pos" style="margin-top:4px">No change today</div>
+          </div>
+          <div class="mcurr-card">
+            <div class="mcurr-top"><span class="mcurr-symbol">USDT</span><span class="mcurr-chain">Solana</span></div>
+            <div class="mcurr-amount">$8,060</div>
+            <div class="mcurr-usd">≈ $8,060 USD · 8% of portfolio</div>
+            <div class="mcurr-change pos" style="margin-top:4px">No change today</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--gray)">Total portfolio value: <strong style="color:var(--navy)">$100,600</strong> · Rates updated every 60 seconds via Coinbase API</div>
+      </div>
+
+    </div><!-- /main-panel -->
+  </div><!-- /device-frame -->
+
+  <!-- TOOLTIP -->
+  <div class="tooltip-card" id="tooltip"></div>
+</div><!-- /screen-area -->
+</div><!-- /demo-shell -->
+
+<script>
+// ── BENEFICIARY SETTLEMENT TYPE ──
+function selectSettleType(type) {
+  ['fiat','usdc','usdt'].forEach(t => {
+    const c = document.getElementById('stype-'+t); if (c) c.classList.remove('sel');
+  });
+  const card = document.getElementById('stype-'+type); if (card) card.classList.add('sel');
+  const fiatForm   = document.getElementById('bene-form-fiat');
+  const cryptoForm = document.getElementById('bene-form-crypto');
+  if (type === 'fiat') {
+    if (fiatForm)   fiatForm.style.display   = 'block';
+    if (cryptoForm) cryptoForm.style.display = 'none';
+  } else {
+    if (fiatForm)   fiatForm.style.display   = 'none';
+    if (cryptoForm) cryptoForm.style.display = 'block';
+    const badge = document.getElementById('crypto-settle-badge');
+    if (badge) {
+      badge.textContent = type === 'usdc' ? 'USDC · Circle' : 'USDT · Tether';
+      badge.style.background = type === 'usdc' ? '#dbeafe' : '#dcfce7';
+      badge.style.color = type === 'usdc' ? '#1d4ed8' : '#15803d';
+    }
+  }
+}
+
+// ── RECEIVE FLOW ──
+function selectReceiveWallet(id) {
+  ['rw-evm','rw-sol'].forEach(i => { const e=document.getElementById(i); if(e) e.classList.remove('sel'); });
+  const el = document.getElementById(id); if (el) el.classList.add('sel');
+}
+function selectReceiveCurrency(id) {
+  ['rc-usdc','rc-usdt','rc-eurc'].forEach(i => { const e=document.getElementById(i); if(e) e.classList.remove('sel'); });
+  const el = document.getElementById(id); if (el) el.classList.add('sel');
+}
+function goToPayerPage() {
+  const idx = STEPS.findIndex(s => s.view === 'payer');
+  if (idx !== -1) goTo(idx);
+}
+
+// ── STABLECOIN PICKER ──
+const PA_RECOMMENDED = ['sc-usdc', 'sc-usdt'];
+let paRecommendedOn = true;
+
+function toggleStable(id) {
+  if (paRecommendedOn) return; // locked in PA-recommended mode
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('sel');
+  updateScFooter();
+}
+
+function togglePARecommended() {
+  paRecommendedOn = !paRecommendedOn;
+  const toggle = document.getElementById('pa-toggle');
+  const bar    = document.getElementById('pa-toggle-bar');
+  if (paRecommendedOn) {
+    toggle.classList.remove('off');
+    bar.style.borderColor = 'var(--blue)';
+    // auto-select recommended, deselect others
+    document.querySelectorAll('.sc-row').forEach(r => r.classList.remove('sel', 'dimmed'));
+    PA_RECOMMENDED.forEach(id => {
+      const el = document.getElementById(id); if (el) el.classList.add('sel');
+    });
+  } else {
+    toggle.classList.add('off');
+    bar.style.borderColor = 'var(--gray-light)';
+    // remove dimming — all rows freely clickable
+    document.querySelectorAll('.sc-row').forEach(r => r.classList.remove('dimmed'));
+  }
+  updateScFooter();
+}
+
+function updateScFooter() {
+  const note = document.getElementById('sc-footer-note');
+  if (!note) return;
+  if (paRecommendedOn) {
+    note.innerHTML = 'PA-recommended selection active: <strong>USDC + USDT</strong>. Toggle off to customise. Stablecoins marked "not on PA\'s exchanges" require the PA to add a new exchange partner. <strong>You never onboard on any exchange directly.</strong>';
+  } else {
+    const selected = [...document.querySelectorAll('.sc-row.sel')].map(r => r.querySelector('.sc-name').textContent);
+    const list = selected.length ? selected.join(', ') : 'none';
+    note.innerHTML = 'Custom selection: <strong>' + list + '</strong>. Stablecoins marked "not on PA\'s exchanges" require the PA to add a new exchange partner. You never onboard on any exchange directly.';
+  }
+}
+
+// ── COINBASE LIVE RATES ──
+async function fetchCoinbaseRates() {
+  const loading = document.getElementById('fx-loading');
+  const card    = document.getElementById('fx-rate-card');
+  const bar     = document.getElementById('fx-bar');
+  if (loading) loading.style.display = 'flex';
+  if (card)    card.style.display    = 'none';
+  // Re-trigger loading bar animation
+  if (bar) { bar.style.animation='none'; bar.offsetHeight; bar.style.animation=''; }
+
+  const fallback = { USDC: '1.0000', SGD: '1.3512' };
+  const [rates] = await Promise.all([
+    fetch('https://api.coinbase.com/v2/exchange-rates?currency=USD')
+      .then(r => r.json()).then(d => d.data.rates)
+      .catch(() => fallback),
+    new Promise(r => setTimeout(r, 1500))  // min load time for demo effect
+  ]);
+
+  const usdcRate = parseFloat(rates.USDC || 1).toFixed(4);
+  const sgdRate  = parseFloat(rates.SGD  || 1.3512).toFixed(4);
+  const usdcAmt  = Math.round(25000 * parseFloat(usdcRate)).toLocaleString('en-US');
+  const sgdAmt   = Math.round(25000 * parseFloat(sgdRate)).toLocaleString('en-US');
+
+  document.getElementById('usdc-rate').textContent = usdcRate;
+  document.getElementById('sgd-rate').textContent  = sgdRate;
+  document.getElementById('usdc-amt').textContent  = usdcAmt + ' USDC';
+  document.getElementById('sgd-amt').textContent   = 'SGD ' + sgdAmt;
+
+  const fxSub = document.getElementById('fx-sub-text');
+  if (fxSub) fxSub.textContent = '1 USD = ' + usdcRate + ' USDC · Live Coinbase · Valid 30s';
+  const sgdOut = document.getElementById('sgd-output');
+  if (sgdOut) sgdOut.value = 'SGD ' + sgdAmt;
+
+  if (loading) loading.style.display = 'none';
+  if (card)    card.style.display    = 'block';
+}
+
+const STEPS = [
+  // ── SECTION 1: OVERVIEW ──────────────────────────────────────
+  {
+    id:1, section:'Overview',
+    view:'dashboard', highlight:'balance-hero', nav:'nav-dash',
+    tooltip:{
+      title:'Acme Corp\'s payment dashboard',
+      body:'This is what Acme Corp sees in the Licensed PA\'s portal. Their USD balance, recent transactions, and global payment stats. <strong>No crypto knowledge needed</strong> — they think in USD.',
+      chip:null, pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:2, section:'Overview',
+    view:'dashboard', highlight:'stat-saved', nav:'nav-dash',
+    tooltip:{
+      title:'0.7% vs SWIFT\'s 2.8%',
+      body:'On a $25,000 transfer, SWIFT costs ~$25,660 (2.5% FX + $35 fee + 3 days of float). Via Licensed PA on Silent Pay rails: $25,175. <strong>$485 saved per transaction.</strong>',
+      chip:null, pos:{top:'40%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 2: SETUP ─────────────────────────────────────────
+  {
+    id:3, section:'Setup',
+    view:'fund', highlight:'fund-wire-card', nav:'nav-dash',
+    tooltip:{
+      title:'Fund your account — fiat wire to PA pool',
+      body:'Before Acme Corp can send anything, they wire USD to the <strong>PA\'s segregated pool bank account</strong>. The reference code identifies which business the funds belong to.<br><br>Once the wire clears, the PA buys USDC on its exchange and <strong>credits Acme Corp\'s USD balance</strong>. The business never touches crypto — the conversion is invisible.',
+      chip:'🏦 Fiat in → USDC credited · 1–2 business days',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:4, section:'Setup',
+    view:'stablecoin', highlight:'sc-picker', nav:'nav-settings',
+    tooltip:{
+      title:'PA-recommended or pick your own',
+      body:'The full list comes from the <strong>PA\'s connected exchanges</strong> (Coinbase Prime + Kraken). Toggle <em>on</em>: PA auto-selects USDC + USDT — best liquidity, 2 sources each. Toggle <em>off</em>: Acme Corp picks any combination — USD, EUR, GBP, JPY, SGD stablecoins. PA adds exchanges → more coins unlock.',
+      chip:'🪙 USDC + USDT recommended · multi-select',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:5, section:'Setup',
+    view:'chain', highlight:'chain-proceed', nav:'nav-settings',
+    tooltip:{
+      title:'Wallets created on all chains — no selection needed',
+      body:'The PA supports 5+ chains. Rather than picking one upfront, <strong>Silent Pay creates wallets on every supported chain at onboarding</strong>. Cost: $0. Time: ~1–2 seconds. Nothing goes on-chain yet.<br><br>Which chain a payment routes through is decided <strong>per transaction</strong> — by the PA\'s routing logic or the business\'s preference.',
+      chip:'⛓ 5 chains · $0 wallet creation cost',
+      pos:{top:'50%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:6, section:'Setup',
+    view:'wallets', highlight:'wallet-grid', nav:'nav-wallets',
+    onEnter: revealWallets,
+    tooltip:{
+      title:'2 DKG runs · 5 chains covered',
+      body:'<strong>Run 1 (EVM):</strong> One DKG on secp256k1 → one address valid on Base, ETH, Polygon, Arbitrum simultaneously.<br><br><strong>Run 2 (Solana):</strong> Separate DKG on Ed25519 → unique Solana address.<br><br>Private key never assembled in either run.',
+      chip:'🔒 3-of-3 MPC · 2 DKG runs · 5 wallets',
+      pos:{top:'10%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:7, section:'Setup',
+    view:'wallets', highlight:'mpc-info', nav:'nav-wallets',
+    tooltip:{
+      title:'Why 2 runs, not 5?',
+      body:'Base, ETH, Polygon, and Arbitrum all use the <strong>same elliptic curve (secp256k1)</strong> → same public key → same wallet address. One DKG covers all four.<br><br>Solana uses <strong>Ed25519</strong> (different maths, different key format) → a completely separate DKG is needed. That\'s it — 2 runs total regardless of how many EVM chains the PA adds.',
+      chip:null,
+      pos:{top:'28%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:8, section:'Setup',
+    view:'add-bene', highlight:'settle-type-row', nav:'nav-bene-mgr',
+    tooltip:{
+      title:'Settlement type drives the whole form',
+      body:'<strong>Local fiat</strong> → bank form appears (SWIFT, account, country). PA converts USDC → local currency at destination. Beneficiary gets a bank wire.<br><br><strong>Hold USDC / USDT</strong> → just a wallet address field. No bank details needed. Stablecoin delivered directly. Beneficiary controls their own off-ramp.',
+      chip:'💵 Fiat selected → bank form shown',
+      pos:{top:'20%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 3: PAYMENT ───────────────────────────────────────
+  {
+    id:9, section:'Payment',
+    view:'dashboard', highlight:'send-btn', nav:'nav-send',
+    tooltip:{
+      title:'Beneficiary saved. Ready to pay.',
+      body:'GlobalTech SG is set up with local fiat (SGD) settlement. Acme Corp now wants to send $25,000 for a software licence. They click <strong>Send</strong>.',
+      chip:null,
+      pos:{top:'12%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:10, section:'Payment',
+    view:'bene', highlight:'bene-sg', nav:'nav-send',
+    tooltip:{
+      title:'Select a saved beneficiary',
+      body:'GlobalTech SG — settlement in SGD (local fiat). SwiftPay DMCC — settlement in USDC directly. The preference set during onboarding is shown right on the card. No re-entry needed.',
+      chip:null,
+      pos:{top:'26%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:11, section:'Payment',
+    view:'amount', highlight:'fx-display', nav:'nav-send',
+    tooltip:{
+      title:'Amount entry — stablecoin route shown',
+      body:'Acme Corp enters $25,000 USD. The rail is shown: $25,000 → <strong>25,000 USDC</strong> on Base → SGD at destination. Live rate fetched next.',
+      chip:null,
+      pos:{top:'20%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:12, section:'Payment',
+    view:'fx', highlight:'fx-rate-card', nav:'nav-send',
+    onEnter: fetchCoinbaseRates,
+    tooltip:{
+      title:'Live rate from Coinbase API',
+      body:'<strong>Step 1:</strong> 1 USD = 1 USDC — the stablecoin peg is always 1:1.<br><br><strong>Step 2:</strong> 25,000 USDC → SGD at the <strong>live Coinbase exchange rate</strong>. Acme Corp sees the exact SGD amount before confirming.',
+      chip:'📡 Coinbase Advanced Trade API · live',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:13, section:'Payment',
+    view:'review', highlight:'view-review', nav:'nav-send',
+    tooltip:{
+      title:'Review — USDC on Base as the rail',
+      body:'The confirmation screen shows <strong>USDC on Base</strong> as the settlement rail. Total fee: 0.7% ($175). Beneficiary gets SGD. Time: ~8 min. <strong>$485 cheaper than SWIFT.</strong>',
+      chip:null,
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:14, section:'Payment',
+    view:'pipeline', highlight:'uth-panel', nav:'nav-send',
+    onEnter: () => animatePipeline(3),
+    tooltip:{
+      title:'USDC moves, beneficiary gets fiat',
+      body:'Licensed PA buys USDC on Coinbase → Silent Pay MPC signs and broadcasts on Base → PA local entity converts USDC to SGD → wires to DBS.<br><br><strong>GlobalTech never sees or holds crypto.</strong>',
+      chip:'🔒 3-of-3 MPC · Base · 2 sec on-chain',
+      pos:{top:'38%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:15, section:'Payment',
+    view:'pipeline', highlight:'pl-steps', nav:'nav-send',
+    onEnter: () => animatePipeline(5),
+    tooltip:{
+      title:'Settled. 8 minutes total.',
+      body:'On-chain settlement: <strong>2 seconds</strong>. Total end-to-end including FX conversions and bank wires: <strong>~8 minutes</strong>.<br><br>Acme Corp gets a real-time status at every step.',
+      chip:'⛓ 0x9f2a confirmed · 1 Base block',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 4: RECEIVE ───────────────────────────────────────
+  {
+    id:16, section:'Receive',
+    view:'receive', highlight:'generated-link', nav:'nav-receive',
+    tooltip:{
+      title:'Now: get paid. Generate a payment link.',
+      body:'Payment sent. Now Acme Corp wants to <em>receive</em> money from a client. They pick which wallet (EVM or Solana), which currency (USDC, USDT, EURC), and optionally pre-fill the amount. <strong>One click generates a hosted payment link</strong> — no bank details needed from the payer.',
+      chip:'🔗 Payment link generated',
+      pos:{top:'44%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:17, section:'Receive',
+    view:'payer', highlight:null, nav:'nav-receive',
+    tooltip:{
+      title:'The payer\'s checkout page',
+      body:'This is what opens when GlobalTech\'s client clicks the link. A clean hosted checkout — Acme Corp\'s name, the amount, and a simple form. <strong>The payer doesn\'t need a crypto wallet.</strong> They pick bank transfer, get wire instructions, Silent Pay handles the rest.',
+      chip:'🌐 Hosted by Silent Pay · no crypto knowledge needed',
+      pos:{top:'20%',left:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 5: COMPLETE ──────────────────────────────────────
+  {
+    id:18, section:'Complete',
+    view:'complete', highlight:null, nav:'nav-hist',
+    tooltip:{
+      title:'$485 saved. 96% faster.',
+      body:'GlobalTech SG received <strong>SGD 33,750</strong> in their DBS account. Total time: 8 min. SWIFT would be 2–4 days + $485 more in fees.<br><br>The stablecoin was invisible. The chain was invisible. Only the result matters.',
+      chip:null,
+      pos:{top:'44%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 6: PLATFORM ──────────────────────────────────────
+  {
+    id:19, section:'Platform',
+    view:'reports', highlight:'rpt-txn-table', nav:'nav-reports',
+    tooltip:{
+      title:'Reports — transaction history + savings',
+      body:'Full filterable transaction log: beneficiary, amount, chain, fee, status. <strong>Export to CSV</strong> for reconciliation.<br><br>The savings report benchmarks every transaction against SWIFT — this is the CFO-level proof point. Q1 2026: $8,240 saved across 54 transactions.',
+      chip:'📊 $8,240 saved vs SWIFT · Q1 2026',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:20, section:'Platform',
+    view:'reports', highlight:'savings-banner', nav:'nav-reports',
+    tooltip:{
+      title:'Savings report — the CFO hook',
+      body:'Volume, average settlement time, number of corridors — all benchmarked against SWIFT cost. <strong>This is what gets shown in QBRs.</strong> The PA can white-label this report for their merchants.',
+      chip:null,
+      pos:{top:'50%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:21, section:'Platform',
+    view:'policy', highlight:'policy-list', nav:'nav-policy',
+    tooltip:{
+      title:'Policy engine — configurable rules',
+      body:'This is Fireblocks\' most-cited feature in enterprise RFPs. Silent Pay matches it: spend limits, whitelist-only external transfers, velocity caps, time-window blocks, new-address holds.<br><br>Each rule is editable. Click <strong>Edit</strong> to modify a rule inline.',
+      chip:'🛡 5 active rules · TAP-equivalent',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:22, section:'Platform',
+    view:'audit', highlight:'audit-table', nav:'nav-audit',
+    tooltip:{
+      title:'Audit trail — SOC 2 ready',
+      body:'Every action logged with timestamp, actor (user or API key), and outcome. Policy evaluations, transaction events, admin changes — all immutable records.<br><br><strong>Blocked</strong> events are flagged in red. Export the full log for compliance reviews.',
+      chip:'📋 SOC 2 · 90-day retention · exportable',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:23, section:'Platform',
+    view:'dev', highlight:'wh-endpoint-card', nav:'nav-dev',
+    tooltip:{
+      title:'Webhooks — real-time event delivery',
+      body:'Configure endpoints and subscribe to events: <code>transaction.completed</code>, <code>transaction.failed</code>, <code>vault.deposit_detected</code>, <code>policy.approval_required</code>.<br><br>Delivery log shows HTTP status per event. Failed deliveries (503) show a <strong>Retry</strong> button. 24-hour resend window.',
+      chip:'⚡ HMAC-signed · exponential backoff retry',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:24, section:'Platform',
+    view:'notif', highlight:null, nav:'nav-notif',
+    tooltip:{
+      title:'Notifications — email + mobile',
+      body:'Finance teams get email on payment completion, failure, and approval requests. Mobile push for time-sensitive alerts. <strong>Webhook retry failure</strong> triggers an email if the endpoint goes down — so nothing is silently dropped.',
+      chip:'📱 Email + iOS push · configurable per event',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  // ── SECTION 7: INFRASTRUCTURE ────────────────────────────────
+  {
+    id:25, section:'Infrastructure',
+    view:'gas', highlight:'gas-chain-grid', nav:'nav-gas',
+    tooltip:{
+      title:'Gas station — merchants never hold ETH',
+      body:'Silent Pay maintains a gas reserve vault per workspace. When a chain\'s reserve drops below the configured threshold, it auto-tops-up from the master vault.<br><br>Arbitrum is currently below threshold — a top-up is queued. The merchant never sees or manages gas.',
+      chip:'⛽ Auto top-up · 4 chains · threshold alerts',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:26, section:'Infrastructure',
+    view:'exc', highlight:'exc-conn-card', nav:'nav-exc',
+    tooltip:{
+      title:'Exchange connectivity — PA-managed accounts',
+      body:'The PA connects its exchange accounts (Coinbase Prime + Kraken) once. Silent Pay uses those connections to move stablecoins between exchange and vault — the merchant never touches the exchange directly.<br><br><strong>Enterprise BYOK:</strong> large clients can plug in their own exchange API keys instead.',
+      chip:'🔗 Coinbase Prime + Kraken · BYOK for enterprise',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+  {
+    id:27, section:'Infrastructure',
+    view:'mcurr', highlight:null, nav:'nav-mcurr',
+    tooltip:{
+      title:'Multi-currency breakdown',
+      body:'Live balances across every stablecoin and chain — USDC, USDT, EURC — with USD equivalents. The allocation bar shows portfolio composition at a glance.<br><br>Rates refresh every 60 seconds via Coinbase API. This view is the treasury dashboard for a PA\'s finance team.',
+      chip:'💱 USDC · USDT · EURC · live rates',
+      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
+    }
+  },
+];
+
+const TOTAL = STEPS.length;
+let current = 0;
+
+// ── BUILD PROGRESS ──
+function buildProgress() {
+  const el = document.getElementById('demo-progress');
+  el.innerHTML = '';
+  let lastSection = '';
+  STEPS.forEach((s, i) => {
+    if (s.section !== lastSection && lastSection !== '') {
+      const spacer = document.createElement('div');
+      spacer.style.cssText = 'width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.06);flex-shrink:0';
+      el.appendChild(spacer);
+    }
+    lastSection = s.section;
+    const d = document.createElement('div');
+    d.className = 'prog-dot';
+    d.title = s.section + ' · Step ' + (i+1);
+    d.onclick = () => goTo(i);
+    el.appendChild(d);
+  });
+}
+
+function showPAConsole() {
+  document.getElementById('login-landing').classList.add('hidden');
+  document.getElementById('pa-console').classList.add('visible');
+}
+
+function hidePAConsole() {
+  hideMerchantDetail();
+  document.getElementById('pa-console').classList.remove('visible');
+  document.getElementById('login-landing').classList.remove('hidden');
+}
+
+function showMerchantDetail() {
+  document.querySelector('#pa-console .pa-body').style.display = 'none';
+  document.getElementById('pa-merchant-detail').classList.add('visible');
+}
+
+function hideMerchantDetail() {
+  document.getElementById('pa-merchant-detail').classList.remove('visible');
+  document.querySelector('#pa-console .pa-body').style.display = '';
+  switchMerchantTab('settings');
+}
+
+function switchMerchantTab(tab) {
+  const isSettings = tab === 'settings';
+  document.getElementById('pamd-tab-settings').classList.toggle('active', isSettings);
+  document.getElementById('pamd-tab-txns').classList.toggle('active', !isSettings);
+  document.getElementById('pamd-settings-body').classList.toggle('hidden', !isSettings);
+  document.getElementById('pamd-txn-body').classList.toggle('visible', !isSettings);
+}
+
+function startDemo() {
+  document.getElementById('intro').classList.add('hidden');
+  buildProgress();
+  goTo(0);
+}
+
+// ── NAVIGATION ──
+function nextStep() { if (current < TOTAL - 1) goTo(current + 1); }
+function restartDemo() { goTo(0); }
+function prevStep() { if (current > 0) goTo(current - 1); }
+function restartDemo() {
+  document.getElementById('intro').classList.remove('hidden');
+  document.getElementById('tooltip').classList.remove('visible');
+  document.getElementById('spotlight').classList.remove('active');
+}
+
+function goTo(idx) {
+  const step = STEPS[idx];
+  current = idx;
+
+  const dots = document.querySelectorAll('.prog-dot');
+  let dotIdx = 0;
+  STEPS.forEach((s, i) => {
+    if (dots[dotIdx]) {
+      dots[dotIdx].className = 'prog-dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+      dotIdx++;
+    }
+    if (i < STEPS.length - 1 && STEPS[i+1].section !== s.section) dotIdx++;
+  });
+
+  document.getElementById('step-counter').textContent = (idx + 1) + ' / ' + TOTAL + ' · ' + step.section;
+  document.getElementById('btn-back').style.opacity = idx === 0 ? '0.4' : '1';
+  document.getElementById('btn-next').textContent = idx === TOTAL - 1 ? 'Done ✓' : 'Next →';
+  document.getElementById('btn-next').style.opacity = idx === TOTAL - 1 ? '0.5' : '1';
+
+  switchView(step.view);
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  if (step.nav) { const el = document.getElementById(step.nav); if (el) el.classList.add('active'); }
+
+  document.querySelectorAll('.sp-highlight').forEach(e => e.classList.remove('sp-highlight'));
+  const spotlight = document.getElementById('spotlight');
+  if (step.highlight) {
+    spotlight.classList.add('active');
+    const t = document.getElementById(step.highlight);
+    if (t) t.classList.add('sp-highlight');
+  } else {
+    spotlight.classList.remove('active');
+  }
+
+  if (step.onEnter) step.onEnter();
+  showTooltip(step);
+}
+
+// ── VIEW SWITCHER ──
+const VIEW_IDS = ['view-dashboard','view-fund','view-stablecoin','view-chain','view-wallets','view-add-bene','view-receive','view-payer','view-bene','view-amount','view-fx','view-review','view-pipeline','view-complete','view-reports','view-policy','view-audit','view-dev','view-notif','view-gas','view-exc','view-mcurr'];
+const VIEW_MAP = {
+  'dashboard':'view-dashboard','fund':'view-fund','stablecoin':'view-stablecoin','chain':'view-chain',
+  'wallets':'view-wallets','add-bene':'view-add-bene','receive':'view-receive','payer':'view-payer',
+  'bene':'view-bene','amount':'view-amount','fx':'view-fx',
+  'review':'view-review','pipeline':'view-pipeline','complete':'view-complete',
+  'reports':'view-reports','policy':'view-policy','audit':'view-audit',
+  'dev':'view-dev','notif':'view-notif','gas':'view-gas','exc':'view-exc','mcurr':'view-mcurr',
+};
+function switchView(name) {
+  VIEW_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display='none'; });
+  const target = document.getElementById(VIEW_MAP[name]);
+  if (target) target.style.display = 'block';
+}
+
+// ── POLICY MODAL ──
+function openPolicyModal()  { const m=document.getElementById('policy-modal'); if(m) m.classList.add('open'); }
+function closePolicyModal() { const m=document.getElementById('policy-modal'); if(m) m.classList.remove('open'); }
+
+// ── DEV TABS ──
+function switchDevTab(tab) {
+  ['wh','api'].forEach(t => {
+    const btn = document.getElementById('dtab-'+t);
+    const pan = document.getElementById('dev-panel-'+t);
+    if (btn) btn.classList.toggle('active', t===tab);
+    if (pan) pan.style.display = t===tab ? 'block' : 'none';
+  });
+}
+
+// ── EXPLORE MODE ──
+let exploreMode = false;
+let activeFlow = null;
+let activeFlowStep = 0;
+
+const EXPLORE_FLOWS = {
+  send: {
+    label: 'Send Payment',
+    steps: [
+      { view:'bene',     label:'Beneficiary' },
+      { view:'amount',   label:'Amount' },
+      { view:'fx',       label:'FX Rate',    onEnter: ()=>fetchCoinbaseRates() },
+      { view:'review',   label:'Review' },
+      { view:'pipeline', label:'Processing', onEnter: ()=>animatePipeline(5) },
+    ]
+  },
+  receive: {
+    label: 'Receive Money',
+    steps: [
+      { view:'receive', label:'Generate Link' },
+      { view:'payer',   label:'Payer Checkout' },
+    ]
+  },
+  setup: {
+    label: 'Account Setup',
+    steps: [
+      { view:'fund',       label:'Fund Account' },
+      { view:'stablecoin', label:'Stablecoins' },
+      { view:'chain',      label:'Chains' },
+      { view:'wallets',    label:'Wallets', onEnter: ()=>revealWallets() },
+      { view:'add-bene',   label:'Add Beneficiary' },
+    ]
+  },
+};
+
+const SIDEBAR_FLOW_MAP = {
+  'send':      { flow:'send',    step:0 },
+  'bene':      { flow:'send',    step:0 },
+  'receive':   { flow:'receive', step:0 },
+  'payer':     { flow:'receive', step:1 },
+  'stablecoin':{ flow:'setup',   step:0 },
+  'wallets':   { flow:'setup',   step:3 },
+  'add-bene':  { flow:'setup',   step:4 },
+  'fund':      { flow:'setup',   step:0 },
+};
+
+function enterFlowExplore(flowKey, stepIdx) {
+  activeFlow = flowKey;
+  activeFlowStep = stepIdx || 0;
+  renderFlowNav();
+  goToFlowStep(activeFlowStep);
+}
+
+function renderFlowNav() {
+  if (!activeFlow) { document.getElementById('explore-flow-nav').style.display='none'; return; }
+  const flow = EXPLORE_FLOWS[activeFlow];
+  document.getElementById('explore-flow-nav').style.display = 'flex';
+  document.getElementById('efn-label').textContent = flow.label;
+  const stepsEl = document.getElementById('efn-steps');
+  stepsEl.innerHTML = flow.steps.map((s,i) => {
+    const cls = i < activeFlowStep ? 'efn-step done' : i === activeFlowStep ? 'efn-step active' : 'efn-step';
+    const sep = i < flow.steps.length-1 ? '<span class="efn-sep">›</span>' : '';
+    return `<span class="${cls}" onclick="goToFlowStep(${i})">${s.label}</span>${sep}`;
+  }).join('');
+  document.getElementById('efn-prev').disabled = activeFlowStep === 0;
+  document.getElementById('efn-next').disabled = activeFlowStep === flow.steps.length - 1;
+  document.getElementById('efn-next').textContent = activeFlowStep === flow.steps.length - 1 ? 'Done ✓' : 'Next →';
+}
+
+function goToFlowStep(idx) {
+  const flow = EXPLORE_FLOWS[activeFlow];
+  if (!flow) return;
+  activeFlowStep = Math.max(0, Math.min(idx, flow.steps.length - 1));
+  const step = flow.steps[activeFlowStep];
+  switchView(step.view);
+  if (step.onEnter) step.onEnter();
+  renderFlowNav();
+  // update sidebar active
+  const navMap = { bene:'nav-send', amount:'nav-send', fx:'nav-send', review:'nav-send', pipeline:'nav-send',
+    receive:'nav-receive', payer:'nav-receive',
+    fund:'nav-dash', stablecoin:'nav-settings', chain:'nav-settings', wallets:'nav-wallets', 'add-bene':'nav-bene-mgr' };
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  const navId = navMap[step.view];
+  if (navId) { const el=document.getElementById(navId); if(el) el.classList.add('active'); }
+}
+
+function exploreFlowStep(dir) {
+  goToFlowStep(activeFlowStep + dir);
+}
+
+function clearFlow() {
+  activeFlow = null;
+  document.getElementById('explore-flow-nav').style.display = 'none';
+}
+
+function enterExplore() {
+  if (exploreMode) return;
+  exploreMode = true;
+  // hide guided UI
+  document.getElementById('demo-nav').style.display = 'none';
+  document.getElementById('demo-progress').style.display = 'none';
+  document.getElementById('explore-bar').style.display = 'flex';
+  document.getElementById('mt-tour').classList.remove('active');
+  document.getElementById('mt-explore').classList.add('active');
+  // clear spotlight + tooltip
+  document.getElementById('spotlight').classList.remove('active');
+  document.querySelectorAll('.sp-highlight').forEach(e => e.classList.remove('sp-highlight'));
+  document.getElementById('tooltip').classList.remove('visible');
+  // start on dashboard
+  switchView('dashboard');
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  const d = document.getElementById('nav-dash'); if (d) d.classList.add('active');
+}
+
+function exitExplore() {
+  if (!exploreMode) return;
+  exploreMode = false;
+  clearFlow();
+  document.getElementById('demo-nav').style.display = 'flex';
+  document.getElementById('demo-progress').style.display = 'flex';
+  document.getElementById('explore-bar').style.display = 'none';
+  document.getElementById('mt-tour').classList.add('active');
+  document.getElementById('mt-explore').classList.remove('active');
+  goTo(current);
+}
+
+function sidebarNav(viewName) {
+  if (!exploreMode) return;
+  // if this view belongs to a flow, activate that flow
+  const flowEntry = SIDEBAR_FLOW_MAP[viewName];
+  if (flowEntry) {
+    enterFlowExplore(flowEntry.flow, flowEntry.step);
+    return;
+  }
+  // standalone view — clear any active flow
+  clearFlow();
+  switchView(viewName);
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  const navMap = {
+    'dashboard':'nav-dash','reports':'nav-reports','policy':'nav-policy','audit':'nav-audit',
+    'dev':'nav-dev','notif':'nav-notif','gas':'nav-gas','exc':'nav-exc','mcurr':'nav-mcurr',
+  };
+  const navId = navMap[viewName];
+  if (navId) { const el = document.getElementById(navId); if (el) el.classList.add('active'); }
+}
+
+// ── TOOLTIP ──
+function showTooltip(step) {
+  const t = step.tooltip;
+  const tc = document.getElementById('tooltip');
+  const isLast = current === TOTAL - 1;
+  let html = `<div class="tc-step">Step ${step.id} of ${TOTAL} · ${step.section}</div>`;
+  html += `<div class="tc-title">${t.title}</div>`;
+  html += `<div class="tc-body">${t.body}</div>`;
+  if (t.chip) html += `<div class="tc-chip">${t.chip}</div>`;
+  if (isLast) {
+    html += `<div class="tc-footer">
+      <button class="tc-back-btn" onclick="prevStep()">← Back</button>
+      <div style="display:flex;gap:6px">
+        <button class="tc-back-btn" onclick="goTo(0)" style="color:var(--blue)">Restart</button>
+        <button class="tc-cta" style="background:linear-gradient(135deg,#2563eb,#7c3aed)" onclick="enterExplore()">Explore ↗</button>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="tc-footer">
+      <button class="tc-back-btn" onclick="prevStep()" ${current===0?'style="opacity:.3"':''}>← Back</button>
+      <button class="tc-cta" onclick="nextStep()">Next →</button>
+    </div>`;
+  }
+  tc.innerHTML = html;
+  tc.className = 'tooltip-card ' + (t.arrow || 'arrow-left');
+  Object.assign(tc.style, {top:'',bottom:'',left:'',right:''});
+  Object.assign(tc.style, t.pos);
+  tc.classList.add('visible');
+  // show topbar explore button on last step
+  const btnExp = document.getElementById('btn-explore');
+  if (btnExp) btnExp.style.display = isLast ? 'inline-flex' : 'none';
+}
+
+// ── WALLET REVEAL ANIMATION ──
+function revealWallets() {
+  ['wc-base','wc-eth','wc-sol'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.remove('revealed');
+  });
+  ['mr1','mr2','mr3','mr4'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.remove('revealed');
+  });
+  ['ms1','ms2','ms3','ms4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className = 'mpc-status'; el.textContent = 'waiting'; }
+  });
+  const comp = document.getElementById('mpc-computing');
+  const done = document.getElementById('mpc-done');
+  if (comp) comp.classList.remove('visible');
+  if (done) done.classList.remove('visible');
+
+  setTimeout(() => { if (comp) comp.classList.add('visible'); }, 200);
+
+  const mpcSteps = [
+    { row:'mr1', status:'ms1', delay:400,  statusText:'✓ done',   statusClass:'mpc-status done' },
+    { row:'mr2', status:'ms2', delay:900,  statusText:'✓ done',   statusClass:'mpc-status done' },
+    { row:'mr3', status:'ms3', delay:1400, statusText:'✓ done',   statusClass:'mpc-status done' },
+    { row:'mr4', status:'ms4', delay:1900, statusText:'✓ ~1 sec', statusClass:'mpc-status done' },
+  ];
+  mpcSteps.forEach(s => {
+    setTimeout(() => {
+      const row = document.getElementById(s.row); if (row) row.classList.add('revealed');
+      const st  = document.getElementById(s.status);
+      if (st) { st.className = s.statusClass; st.textContent = s.statusText; }
+    }, s.delay);
+  });
+
+  setTimeout(() => {
+    if (comp) comp.classList.remove('visible');
+    if (done) done.classList.add('visible');
+  }, 2200);
+
+  setTimeout(()=>{ const el=document.getElementById('wc-evm'); if(el) el.classList.add('revealed'); }, 2500);
+  setTimeout(()=>{ const el=document.getElementById('wc-sol'); if(el) el.classList.add('revealed'); }, 2900);
+}
+
+// ── PIPELINE ANIMATION ──
+function animatePipeline(upTo) {
+  const steps = [
+    {dot:'pd2',line:'pl2',time:'pt2',timeVal:'14:22:08'},
+    {dot:'pd3',line:'pl3',time:'pt3',timeVal:'14:22:15 · Base confirmed'},
+    {dot:'pd4',line:'pl4',time:'pt4',timeVal:'14:22:21'},
+    {dot:'pd5',line:'pl5',time:'pt5',timeVal:'14:22:28'},
+    {dot:'pd6',line:null, time:'pt6',timeVal:'14:30:13 · Complete',title:'✓ Payment complete'},
+  ];
+  steps.forEach((s,i)=>{
+    const d=document.getElementById(s.dot); if(d){d.className='ps-dot wait';d.textContent=(i+2).toString();}
+    if(s.line){const l=document.getElementById(s.line);if(l)l.className='ps-line';}
+    const t=document.getElementById(s.time);if(t)t.textContent='Waiting...';
+  });
+  document.getElementById('pl-badge').textContent='Processing';
+  document.getElementById('pl-badge').style.cssText='background:var(--blue-light);color:var(--blue)';
+
+  let delay = 500;
+  for(let i=0;i<upTo&&i<steps.length;i++){
+    ((idx)=>{
+      setTimeout(()=>{
+        const s=steps[idx];
+        const d=document.getElementById(s.dot);if(d){d.className='ps-dot done';d.textContent='✓';}
+        if(s.line){const l=document.getElementById(s.line);if(l)l.className='ps-line done';}
+        const t=document.getElementById(s.time);if(t)t.textContent=s.timeVal;
+        if(s.title)document.getElementById('pt6-title').textContent=s.title;
+        if(idx<steps.length-1&&idx<upTo-1){
+          const nd=document.getElementById(steps[idx+1].dot);
+          if(nd){nd.className='ps-dot active';nd.textContent='→';}
+        }
+        if(idx===upTo-1){
+          const b=document.getElementById('pl-badge');
+          b.textContent='Complete';b.style.cssText='background:var(--green-bg);color:#15803d';
+        }
+      }, delay);
+    })(i);
+    delay += 900;
+  }
+}
+</script>
+</body>
+</html>
