@@ -532,6 +532,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .exc-bal-symbol{font-size:10px;font-weight:700;color:var(--gray)}
 .exc-bal-amount{font-size:12px;font-weight:700;color:var(--navy);margin-top:1px}
 .exc-meta{font-size:10px;color:var(--gray);margin-top:7px}
+.ramp-option-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.ramp-option-card:hover{border-color:rgba(255,255,255,.2)}
 
 /* ===== MULTI-CURRENCY ===== */
 .mcurr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -897,65 +899,150 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
     </div>
 
     <!-- PA Exchanges view -->
-    <div class="pa-body" id="pa-body-exchanges" style="display:none;padding:20px 24px;flex-direction:column;gap:14px">
-      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Exchange Connections</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:-8px;margin-bottom:8px">PayFlow Corp's connected exchange accounts. Credentials stored encrypted. Used for on-ramp and off-ramp orchestration across all merchant wallets.</div>
-      <div class="exc-conn-card">
-        <div class="exc-conn-top">
-          <span class="exc-conn-name">Coinbase Prime</span>
-          <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 2 min ago</span>
-        </div>
-        <div class="exc-balances">
-          <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$142,800</div></div>
-          <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$38,400</div></div>
-          <div class="exc-bal-item"><div class="exc-bal-symbol">PYUSD</div><div class="exc-bal-amount">$12,000</div></div>
-        </div>
-        <div class="exc-meta">Stablecoins: USDC, USDT, PYUSD, EURC · API key: cb_prime_***9a4c · <span style="color:#22c55e">BYOK</span></div>
-      </div>
-      <div class="exc-conn-card">
-        <div class="exc-conn-top">
-          <span class="exc-conn-name">Kraken</span>
-          <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 5 min ago</span>
-        </div>
-        <div class="exc-balances">
-          <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$89,200</div></div>
-          <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$54,100</div></div>
-          <div class="exc-bal-item"><div class="exc-bal-symbol">EURT</div><div class="exc-bal-amount">€18,500</div></div>
-        </div>
-        <div class="exc-meta">Stablecoins: USDC, USDT, EURT · API key: kr_***7f1d · <span style="color:#22c55e">BYOK</span></div>
-      </div>
-      <button id="btn-connect-exchange" onclick="showConnectExchange()" style="align-self:flex-start;padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Connect Exchange</button>
+    <div class="pa-body" id="pa-body-exchanges" style="display:none;padding:20px 24px;flex-direction:column;gap:20px">
 
-      <!-- Connect Exchange form -->
-      <div id="connect-exchange-form" style="display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px 20px;flex-direction:column;gap:14px;max-width:480px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:13px;font-weight:600;color:#fff">Connect Exchange Account</div>
-          <button onclick="hideConnectExchange()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;font-family:var(--font)">✕</button>
+      <!-- Option 1: Ramp Provider -->
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">
+          <div style="font-size:13px;font-weight:700;color:#fff">Option 1 — Ramp Provider</div>
+          <span style="font-size:10px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);padding:2px 7px;border-radius:4px;font-weight:600">Not configured</span>
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Exchange</label>
-          <select style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none">
-            <option>Binance</option>
-            <option>Coinbase Advanced Trade</option>
-            <option>Kraken</option>
-            <option>OKX</option>
-            <option>Bybit</option>
-          </select>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:12px">No exchange account needed. Silent Pay has pre-negotiated platform integrations with Bridge, MoonPay, and Transak. Select a provider and enable it — no separate onboarding or API keys required. They handle fiat collection and conversion; Silent Pay handles the wallet side.</div>
+
+        <!-- Ramp provider option cards — click to select -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+          <div class="ramp-option-card" id="ramp-bridge" onclick="selectRamp('bridge')">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#7c3aed;border:1px solid rgba(124,58,237,.3)">B</div>
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#fff">Bridge <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,.35)">by Stripe</span></div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.4)">USD · EUR · GBP · SGD · INR · 30+ currencies · USDC · USDT</div>
+                </div>
+              </div>
+              <div id="ramp-bridge-sel" style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0"></div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">On-ramp + off-ramp · API-first · best for B2B corridors</div>
+          </div>
+          <div class="ramp-option-card" id="ramp-moonpay" onclick="selectRamp('moonpay')">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0f0f23,#1a1a3e);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#2563eb;border:1px solid rgba(37,99,235,.3)">M</div>
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#fff">MoonPay</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.4)">USD · EUR · GBP · AUD · 150+ countries · USDC · USDT · PYUSD</div>
+                </div>
+              </div>
+              <div id="ramp-moonpay-sel" style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0"></div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">On-ramp + off-ramp · card + bank transfer · best for consumer-facing flows</div>
+          </div>
+          <div class="ramp-option-card" id="ramp-transak" onclick="selectRamp('transak')">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0d1b0d,#0a2e0a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#22c55e;border:1px solid rgba(34,197,94,.3)">T</div>
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#fff">Transak</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.4)">USD · EUR · INR · SEA currencies · USDC · USDT · 100+ countries</div>
+                </div>
+              </div>
+              <div id="ramp-transak-sel" style="width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0"></div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">On-ramp + off-ramp · strong India/SEA coverage · card + UPI + bank</div>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Key</label>
-          <input value="bnb_live_4f8a2c1d9e7b3f6a0d5c8e2b1a4f7d3c" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Secret</label>
-          <input value="••••••••••••••••••••••••••••••••" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:rgba(255,255,255,.4);font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
-        </div>
-        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:rgba(255,255,255,.5)">Keys are encrypted at rest and never exposed via API. Silent Pay uses them only for exchange ↔ wallet orchestration.</div>
-        <div style="display:flex;gap:8px">
-          <button onclick="submitConnectExchange()" style="padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Connect</button>
-          <button onclick="hideConnectExchange()" style="padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+
+        <!-- Enable form — shown after selecting a provider -->
+        <div id="connect-ramp-form" style="display:none;margin-top:2px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 18px;flex-direction:column;gap:12px;max-width:480px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:600;color:#fff">Enable <span id="ramp-form-name">Bridge</span></div>
+            <button onclick="hideConnectRamp()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;font-family:var(--font)">✕</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Direction</label>
+            <select style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none">
+              <option>On-ramp + Off-ramp</option><option>On-ramp only</option><option>Off-ramp only</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Stablecoin to settle into wallets</label>
+            <select style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none">
+              <option>USDC (recommended)</option><option>USDT</option><option>PYUSD</option>
+            </select>
+          </div>
+          <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:rgba(255,255,255,.5);line-height:1.5">Silent Pay has a pre-negotiated platform integration with this provider. No separate account or API keys needed. They handle fiat collection, KYC, and conversion — Silent Pay receives the stablecoin and deposits it into the merchant wallet.</div>
+          <div style="display:flex;gap:8px">
+            <button onclick="submitConnectRamp()" style="padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Enable</button>
+            <button onclick="hideConnectRamp()" style="padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+          </div>
         </div>
       </div>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid rgba(255,255,255,.07)"></div>
+
+      <!-- Option 2: BYOK -->
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">
+          <div style="font-size:13px;font-weight:700;color:#fff">Option 2 — Bring Your Own Exchange (BYOK)</div>
+          <span style="font-size:10px;background:rgba(34,197,94,.15);color:#22c55e;padding:2px 7px;border-radius:4px;font-weight:600">Active</span>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:12px">You have your own exchange account (Coinbase Prime, Kraken, Binance). Connect your API keys — Silent Pay orchestrates crypto movement between exchange and wallets on your behalf. You own the exchange relationship entirely.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="exc-conn-card">
+            <div class="exc-conn-top">
+              <span class="exc-conn-name">Coinbase Prime</span>
+              <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 2 min ago</span>
+            </div>
+            <div class="exc-balances">
+              <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$142,800</div></div>
+              <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$38,400</div></div>
+              <div class="exc-bal-item"><div class="exc-bal-symbol">PYUSD</div><div class="exc-bal-amount">$12,000</div></div>
+            </div>
+            <div class="exc-meta">USDC · USDT · PYUSD · EURC · API key: cb_prime_***9a4c · <span style="color:#22c55e">BYOK</span></div>
+          </div>
+          <div class="exc-conn-card">
+            <div class="exc-conn-top">
+              <span class="exc-conn-name">Kraken</span>
+              <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 5 min ago</span>
+            </div>
+            <div class="exc-balances">
+              <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$89,200</div></div>
+              <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$54,100</div></div>
+              <div class="exc-bal-item"><div class="exc-bal-symbol">EURT</div><div class="exc-bal-amount">€18,500</div></div>
+            </div>
+            <div class="exc-meta">USDC · USDT · EURT · API key: kr_***7f1d · <span style="color:#22c55e">BYOK</span></div>
+          </div>
+        </div>
+        <button id="btn-connect-exchange" onclick="showConnectExchange()" style="margin-top:10px;align-self:flex-start;padding:7px 14px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Connect Exchange</button>
+        <!-- BYOK form -->
+        <div id="connect-exchange-form" style="display:none;margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px 20px;flex-direction:column;gap:12px;max-width:480px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:600;color:#fff">Connect Exchange Account</div>
+            <button onclick="hideConnectExchange()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;font-family:var(--font)">✕</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Exchange</label>
+            <select style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none">
+              <option>Binance</option><option>Coinbase Advanced Trade</option><option>Kraken</option><option>OKX</option><option>Bybit</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Key</label>
+            <input value="bnb_live_4f8a2c1d9e7b3f6a0d5c8e2b1a4f7d3c" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Secret</label>
+            <input value="••••••••••••••••••••••••••••••••" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:rgba(255,255,255,.4);font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
+          </div>
+          <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:rgba(255,255,255,.5)">Keys are encrypted at rest and never exposed via API. Silent Pay uses them only for exchange ↔ wallet orchestration.</div>
+          <div style="display:flex;gap:8px">
+            <button onclick="submitConnectExchange()" style="padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Connect</button>
+            <button onclick="hideConnectExchange()" style="padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PA Webhooks view -->
@@ -2687,6 +2774,70 @@ function submitConnectExchange() {
   successNote.style.cssText = 'background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:#22c55e;max-width:480px';
   successNote.innerHTML = '✓ Binance connected successfully · syncing balances...';
   body.appendChild(successNote);
+}
+
+let selectedRamp = null;
+const rampMeta = {
+  bridge:  { name: 'Bridge (Stripe)', desc: 'On-ramp + Off-ramp · USDC · USD · EUR · GBP · SGD · INR · 30+ currencies', note: 'B2B corridors · API-first' },
+  moonpay: { name: 'MoonPay',         desc: 'On-ramp + Off-ramp · USDC · USDT · PYUSD · USD · EUR · 150+ countries',    note: 'Card + bank transfer' },
+  transak: { name: 'Transak',         desc: 'On-ramp + Off-ramp · USDC · USDT · USD · EUR · INR · SEA currencies',      note: 'Card + UPI + bank · India/SEA' }
+};
+
+function selectRamp(id) {
+  selectedRamp = id;
+  ['bridge','moonpay','transak'].forEach(r => {
+    const sel = document.getElementById('ramp-' + r + '-sel');
+    const card = document.getElementById('ramp-' + r);
+    if (r === id) {
+      sel.style.background = '#7c3aed';
+      sel.style.borderColor = '#7c3aed';
+      card.style.borderColor = 'rgba(124,58,237,.5)';
+    } else {
+      sel.style.background = 'transparent';
+      sel.style.borderColor = 'rgba(255,255,255,.2)';
+      card.style.borderColor = 'rgba(255,255,255,.08)';
+    }
+  });
+  document.getElementById('ramp-form-name').textContent = rampMeta[id].name;
+  document.getElementById('connect-ramp-form').style.display = 'flex';
+}
+
+function hideConnectRamp() {
+  document.getElementById('connect-ramp-form').style.display = 'none';
+  selectedRamp = null;
+  ['bridge','moonpay','transak'].forEach(r => {
+    document.getElementById('ramp-' + r + '-sel').style.background = 'transparent';
+    document.getElementById('ramp-' + r + '-sel').style.borderColor = 'rgba(255,255,255,.2)';
+    document.getElementById('ramp-' + r).style.borderColor = 'rgba(255,255,255,.08)';
+  });
+}
+
+function submitConnectRamp() {
+  if (!selectedRamp) return;
+  const meta = rampMeta[selectedRamp];
+  hideConnectRamp();
+  // insert enabled card above the provider list
+  const rampSection = document.getElementById('connect-ramp-form').parentElement;
+  const providerList = rampSection.querySelector('[id^="ramp-bridge"]').parentElement;
+  const card = document.createElement('div');
+  card.style.cssText = 'background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:12px 14px;margin-bottom:10px';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:13px;font-weight:700;color:#fff">${meta.name}</span>
+      <span style="font-size:10px;background:rgba(34,197,94,.15);color:#22c55e;padding:2px 7px;border-radius:4px;font-weight:600"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;vertical-align:middle"></span>Enabled</span>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px">${meta.desc}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.3)">${meta.note} · No separate account needed · Managed by Silent Pay</div>`;
+  rampSection.insertBefore(card, providerList);
+  // update section status badge
+  const badges = document.querySelectorAll('#pa-body-exchanges span');
+  badges.forEach(el => {
+    if (el.textContent === 'Not configured') {
+      el.textContent = 'Active';
+      el.style.background = 'rgba(34,197,94,.15)';
+      el.style.color = '#22c55e';
+    }
+  });
 }
 
 function switchPATab(tab) {
