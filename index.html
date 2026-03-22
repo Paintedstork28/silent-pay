@@ -861,7 +861,38 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         </div>
         <div class="exc-meta">Stablecoins: USDC, USDT, EURT · API key: kr_***7f1d · <span style="color:#22c55e">BYOK</span></div>
       </div>
-      <button style="align-self:flex-start;padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Connect Exchange</button>
+      <button id="btn-connect-exchange" onclick="showConnectExchange()" style="align-self:flex-start;padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Connect Exchange</button>
+
+      <!-- Connect Exchange form -->
+      <div id="connect-exchange-form" style="display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px 20px;flex-direction:column;gap:14px;max-width:480px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;font-weight:600;color:#fff">Connect Exchange Account</div>
+          <button onclick="hideConnectExchange()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;font-family:var(--font)">✕</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">Exchange</label>
+          <select style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none">
+            <option>Binance</option>
+            <option>Coinbase Advanced Trade</option>
+            <option>Kraken</option>
+            <option>OKX</option>
+            <option>Bybit</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Key</label>
+          <input value="bnb_live_4f8a2c1d9e7b3f6a0d5c8e2b1a4f7d3c" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:#fff;font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:11px;color:rgba(255,255,255,.45);font-weight:600">API Secret</label>
+          <input value="••••••••••••••••••••••••••••••••" style="background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px 10px;color:rgba(255,255,255,.4);font-size:12px;font-family:var(--font);outline:none;width:100%;box-sizing:border-box">
+        </div>
+        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:rgba(255,255,255,.5)">Keys are encrypted at rest and never exposed via API. Silent Pay uses them only for exchange ↔ wallet orchestration.</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="submitConnectExchange()" style="padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Connect</button>
+          <button onclick="hideConnectExchange()" style="padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2519,6 +2550,23 @@ function hidePAConsole() {
   hideMerchantDetail();
   document.getElementById('pa-console').classList.remove('visible');
   document.getElementById('login-landing').classList.remove('hidden');
+}
+
+function showConnectExchange() {
+  document.getElementById('connect-exchange-form').style.display = 'flex';
+  document.getElementById('btn-connect-exchange').style.display = 'none';
+}
+function hideConnectExchange() {
+  document.getElementById('connect-exchange-form').style.display = 'none';
+  document.getElementById('btn-connect-exchange').style.display = '';
+}
+function submitConnectExchange() {
+  hideConnectExchange();
+  const body = document.getElementById('pa-body-exchanges');
+  const successNote = document.createElement('div');
+  successNote.style.cssText = 'background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:7px;padding:9px 12px;font-size:11px;color:#22c55e;max-width:480px';
+  successNote.innerHTML = '✓ Binance connected successfully · syncing balances...';
+  body.appendChild(successNote);
 }
 
 function switchPATab(tab) {
