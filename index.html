@@ -2914,14 +2914,12 @@ function switchPATab(tab) {
 }
 
 function showMerchantDetail() {
-  ['businesses','exchanges','gas','webhooks'].forEach(t => document.getElementById('pa-body-' + t).style.display = 'none');
   document.getElementById('pa-merchant-detail').classList.add('visible');
   updateShardViz();
 }
 
 function hideMerchantDetail() {
   document.getElementById('pa-merchant-detail').classList.remove('visible');
-  switchPATab('businesses');
   switchMerchantTab('settings');
 }
 
