@@ -733,6 +733,12 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .pamd-val.ok{color:#34d399}
 .pamd-val.warn{color:#fbbf24}
 .pamd-val.off{color:rgba(255,255,255,.25)}
+.mpc-scheme-opt{padding:8px 16px;border-radius:8px;border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);cursor:pointer;text-align:center;min-width:110px;transition:all .15s}
+.mpc-scheme-opt.active{border-color:#2563eb;color:#fff;background:rgba(37,99,235,.12)}
+.mpc-scheme-opt:hover:not(.active){border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)}
+.shard-slot{display:flex;flex-direction:column;gap:5px;min-width:170px}
+.shard-slot-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.35)}
+.shard-select{background:#0f1629;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 9px;color:#fff;font-size:11px;font-family:var(--font);outline:none;width:100%}
 .flag-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
 .flag-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px}
 .flag-label{font-size:11px;color:rgba(255,255,255,.55)}
@@ -1188,6 +1194,64 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         <div class="pamd-row"><span class="pamd-key">Whitelist-only</span><span class="pamd-val ok">Enforced</span></div>
         <div class="pamd-row"><span class="pamd-key">New address hold</span><span class="pamd-val ok">24h · Active</span></div>
         <div class="pamd-row"><span class="pamd-key">Large tx approval</span><span class="pamd-val warn">> $50K · 2-of-3</span></div>
+      </div>
+
+      <!-- MPC Wallet Configuration -->
+      <div class="pamd-card full" id="mpc-config-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="pamd-card-title" style="margin-bottom:0">MPC Wallet Configuration</div>
+          <span style="font-size:10px;color:rgba(255,255,255,.35)">Applies to all wallets for this merchant · changes take effect on next key rotation</span>
+        </div>
+
+        <!-- Scheme picker -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <div class="mpc-scheme-opt active" id="scheme-22" onclick="selectScheme('22')">
+            <div style="font-size:13px;font-weight:700;color:inherit">(2,2)</div>
+            <div style="font-size:10px;margin-top:1px">2 shards · both required</div>
+          </div>
+          <div class="mpc-scheme-opt" id="scheme-23" onclick="selectScheme('23')">
+            <div style="font-size:13px;font-weight:700;color:inherit">(2,3)</div>
+            <div style="font-size:10px;margin-top:1px">3 shards · any 2 required</div>
+          </div>
+        </div>
+
+        <!-- Shard slots -->
+        <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap" id="shard-slots">
+          <div class="shard-slot" id="shard-1">
+            <div class="shard-slot-label">Shard 1</div>
+            <select class="shard-select" onchange="updateShardViz()">
+              <option value="pe">Payment Entity server</option>
+              <option value="sp" selected>Silent Pay SGX enclave</option>
+              <option value="phone">User device (via app)</option>
+              <option value="custodian">Third-party custodian</option>
+            </select>
+          </div>
+          <div style="font-size:18px;color:rgba(255,255,255,.2);align-self:center;margin-top:10px">+</div>
+          <div class="shard-slot" id="shard-2">
+            <div class="shard-slot-label">Shard 2</div>
+            <select class="shard-select" onchange="updateShardViz()">
+              <option value="pe" selected>Payment Entity server</option>
+              <option value="sp">Silent Pay SGX enclave</option>
+              <option value="phone">User device (via app)</option>
+              <option value="custodian">Third-party custodian</option>
+            </select>
+          </div>
+          <div style="font-size:18px;color:rgba(255,255,255,.2);align-self:center;margin-top:10px" id="shard-plus-3" style="display:none">+</div>
+          <div class="shard-slot" id="shard-3" style="display:none">
+            <div class="shard-slot-label">Shard 3</div>
+            <select class="shard-select" onchange="updateShardViz()">
+              <option value="pe">Payment Entity server</option>
+              <option value="sp">Silent Pay SGX enclave</option>
+              <option value="phone">User device (via app)</option>
+              <option value="custodian" selected>Third-party custodian</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Visual summary -->
+        <div id="mpc-viz" style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;font-size:11px;color:rgba(255,255,255,.5);line-height:1.6"></div>
+
+        <button onclick="saveMPCConfig()" style="margin-top:12px;padding:7px 18px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font)">Save Configuration</button>
       </div>
 
       <!-- Row 2: Feature flags (full width, 4-col grid) -->
@@ -2852,12 +2916,58 @@ function switchPATab(tab) {
 function showMerchantDetail() {
   ['businesses','exchanges','gas','webhooks'].forEach(t => document.getElementById('pa-body-' + t).style.display = 'none');
   document.getElementById('pa-merchant-detail').classList.add('visible');
+  updateShardViz();
 }
 
 function hideMerchantDetail() {
   document.getElementById('pa-merchant-detail').classList.remove('visible');
   switchPATab('businesses');
   switchMerchantTab('settings');
+}
+
+const SHARD_LABELS = {
+  pe: 'Payment Entity server',
+  sp: 'Silent Pay SGX enclave',
+  phone: 'User device (via app)',
+  custodian: 'Third-party custodian'
+};
+
+function selectScheme(s) {
+  document.getElementById('scheme-22').classList.toggle('active', s === '22');
+  document.getElementById('scheme-23').classList.toggle('active', s === '23');
+  const show3 = s === '23';
+  document.getElementById('shard-3').style.display = show3 ? 'flex' : 'none';
+  document.getElementById('shard-plus-3').style.display = show3 ? 'block' : 'none';
+  updateShardViz();
+}
+
+function updateShardViz() {
+  const is23 = document.getElementById('scheme-23').classList.contains('active');
+  const s1 = document.querySelector('#shard-1 select').value;
+  const s2 = document.querySelector('#shard-2 select').value;
+  const s3 = is23 ? document.querySelector('#shard-3 select').value : null;
+  const scheme = is23 ? '(2,3)' : '(2,2)';
+  const shards = [SHARD_LABELS[s1], SHARD_LABELS[s2]];
+  if (s3) shards.push(SHARD_LABELS[s3]);
+  const sigNote = is23
+    ? 'Any 2 of 3 shards required to sign. One shard can go offline — transactions still proceed.'
+    : 'Both shards required to sign. Neither party can transact alone.';
+  document.getElementById('mpc-viz').innerHTML =
+    `<strong style="color:rgba(255,255,255,.7)">${scheme} · ${shards.join(' + ')}</strong><br>${sigNote}`;
+}
+
+function saveMPCConfig() {
+  const btn = document.querySelector('#mpc-config-card button');
+  btn.textContent = '✓ Saved';
+  btn.style.background = 'rgba(34,197,94,.2)';
+  btn.style.color = '#34d399';
+  btn.style.border = '1px solid rgba(34,197,94,.3)';
+  setTimeout(() => {
+    btn.textContent = 'Save Configuration';
+    btn.style.background = 'linear-gradient(135deg,#2563eb,#7c3aed)';
+    btn.style.color = '#fff';
+    btn.style.border = 'none';
+  }, 2000);
 }
 
 function switchMerchantTab(tab) {
