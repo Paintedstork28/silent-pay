@@ -282,6 +282,11 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .generated-link-card{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;margin-bottom:10px}
 .gl-title{font-size:11px;font-weight:600;color:#15803d;margin-bottom:6px}
 .gl-url{font-family:var(--mono);font-size:10px;color:#166534;background:#fff;border-radius:5px;padding:7px 10px;word-break:break-all;border:1px solid #bbf7d0}
+.gl-details{margin-top:8px;margin-bottom:4px;border-top:1px solid #bbf7d0;padding-top:8px}
+.gl-detail-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:3px 0;border-bottom:1px solid rgba(187,247,208,.5)}
+.gl-detail-row:last-child{border-bottom:none}
+.gl-dk{color:#6b7280;font-weight:500}
+.gl-dv{color:#15803d;font-weight:600;font-family:var(--mono);font-size:10px}
 .gl-actions{display:flex;gap:7px;margin-top:8px}
 .gl-btn{padding:5px 13px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font)}
 .gl-btn-copy{background:#15803d;color:#fff}
@@ -305,6 +310,29 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .pp-cta{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;width:100%;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
 .pp-footer{font-size:10px;color:var(--gray);text-align:center;margin-top:8px}
 .pp-footer a{color:var(--blue)}
+/* payment processing overlay */
+.pp-processing{display:none;flex-direction:column;align-items:center;padding:20px 0 10px}
+.pp-spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px}
+.pp-proc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px}
+.pp-proc-steps{width:100%;padding:0 4px}
+.pp-proc-step{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray);padding:5px 0;border-bottom:1px solid var(--gray-lighter)}
+.pp-proc-step:last-child{border-bottom:none}
+.pp-proc-step .ps-icon{width:18px;height:18px;border-radius:50%;background:var(--gray-light);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.pp-proc-step.done .ps-icon{background:#dcfce7;color:#15803d}
+.pp-proc-step.active .ps-icon{background:#dbeafe;color:var(--blue);animation:pulse 1s ease-in-out infinite}
+.pp-proc-step.done{color:var(--navy)}
+.pp-proc-step.active{color:var(--blue);font-weight:600}
+/* payment success */
+.pp-success{display:none;flex-direction:column;align-items:center;padding:14px 0}
+.pp-success-icon{width:52px;height:52px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:10px}
+.pp-success-title{font-size:16px;font-weight:700;color:#15803d;margin-bottom:3px}
+.pp-success-sub{font-size:11px;color:var(--gray);margin-bottom:14px}
+.pp-success-details{width:100%;background:#f0fdf4;border-radius:8px;padding:10px 13px}
+.pp-sd-row{display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(187,247,208,.5)}
+.pp-sd-row:last-child{border-bottom:none}
+.pp-sd-k{color:var(--gray)}
+.pp-sd-v{color:var(--navy);font-weight:600;font-family:var(--mono);font-size:10px}
+.pp-sd-v.green{color:#15803d}
 
 /* ===== FUND ACCOUNT ===== */
 .fund-flow-banner{display:flex;align-items:center;gap:6px;background:var(--blue-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap}
@@ -406,6 +434,39 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .wh-url{font-family:var(--mono);font-size:11px;color:var(--navy);font-weight:500;margin-bottom:6px}
 .wh-events{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
 .wh-evt{font-size:10px;background:var(--blue-light);color:var(--blue);padding:2px 6px;border-radius:3px;font-family:var(--mono)}
+.wh-evt.off{background:var(--gray-light);color:var(--gray)}
+.wbal-card{background:#fff;border:1px solid var(--gray-light);border-radius:10px;overflow:hidden}
+.wbal-header{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--gray-lighter)}
+.wbal-name{font-size:13px;font-weight:700;color:var(--navy)}
+.wbal-addr{font-size:10px;color:var(--gray);font-family:var(--mono);margin-top:2px}
+.wbal-total{font-size:16px;font-weight:700;color:var(--navy)}
+.wbal-currencies{padding:10px 14px;border-bottom:1px solid var(--gray-lighter)}
+.wbal-curr-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--gray-lighter)}
+.wbal-curr-row:last-child{border-bottom:none}
+.wbal-curr-left{display:flex;align-items:center;gap:8px}
+.wbal-symbol{font-size:12px;font-weight:700;color:var(--navy)}
+.wbal-chain-tag{font-size:10px;color:var(--gray)}
+.wbal-curr-right{text-align:right}
+.wbal-amount{font-size:13px;font-weight:600;color:var(--navy)}
+.wbal-change{font-size:10px;margin-top:1px}
+.wbal-change.pos{color:var(--green)}
+.wbal-change.neg{color:var(--red)}
+.wbal-ledger-title{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;padding:8px 14px 4px}
+.wbal-ledger{padding:0 14px 10px}
+.wbal-ledger-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-lighter);font-size:10px}
+.wbal-ledger-row:last-child{border-bottom:none}
+.wbal-ledger-ts{font-family:var(--mono);color:var(--gray);width:90px;flex-shrink:0}
+.wbal-ledger-desc{flex:1;color:var(--navy)}
+.wbal-ledger-amt{font-weight:600;font-family:var(--mono)}
+.wbal-ledger-amt.in{color:var(--green)}
+.wbal-ledger-amt.out{color:var(--red)}
+.wh-ro-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-light)}
+.wh-ro-row:last-child{border-bottom:none}
+.wh-ro-desc{font-size:10px;color:var(--gray);flex:1}
+.pa-wh-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pa-wh-row:last-child{border-bottom:none}
+.pa-wh-name{font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.8);margin-bottom:2px}
+.pa-wh-desc{font-size:10px;color:rgba(255,255,255,.3)}
 .wh-log{background:var(--gray-lighter);border-radius:6px;padding:8px 10px;margin-top:8px}
 .wh-log-title{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .wh-log-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--gray-light);font-size:10px}
@@ -443,7 +504,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
 .audit-row:last-child{border-bottom:none}
 .audit-ts{font-family:var(--mono);font-size:10px;color:var(--gray)}
 .audit-action{color:var(--navy);font-weight:500}
-.audit-actor{font-size:10px;color:var(--gray)}
+.audit-origin{font-size:10px;color:var(--gray)}
 .audit-result{font-size:10px;font-weight:700}
 .audit-result.ok{color:var(--green)}
 .audit-result.blocked{color:var(--red)}
@@ -737,6 +798,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
       <div style="display:flex;gap:0;margin-left:auto;margin-right:16px;background:rgba(255,255,255,.06);border-radius:7px;padding:3px">
         <button id="pa-tab-businesses" onclick="switchPATab('businesses')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff">Businesses</button>
         <button id="pa-tab-exchanges" onclick="switchPATab('exchanges')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:transparent;color:rgba(255,255,255,.5)">Exchanges</button>
+        <button id="pa-tab-gas" onclick="switchPATab('gas')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:transparent;color:rgba(255,255,255,.5)">Gas Station</button>
+        <button id="pa-tab-webhooks" onclick="switchPATab('webhooks')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:transparent;color:rgba(255,255,255,.5)">Webhooks</button>
       </div>
       <div class="pa-user">
         <span>admin@payflowcorp.com</span>
@@ -892,6 +955,108 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
           <button onclick="submitConnectExchange()" style="padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Connect</button>
           <button onclick="hideConnectExchange()" style="padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
         </div>
+      </div>
+    </div>
+
+    <!-- PA Webhooks view -->
+    <div class="pa-body" id="pa-body-webhooks" style="display:none;padding:20px 24px;flex-direction:column;gap:14px">
+      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Webhooks — PayFlow Corp Workspace</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:-8px;margin-bottom:4px">Workspace-level events fired to PayFlow Corp's server. Covers all merchants. PayFlow Corp controls all webhook subscriptions — merchants see notifications only.</div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;font-weight:600;color:#fff">https://api.payflowcorp.com/silent-pay/events</div>
+          <span style="font-size:10px;background:rgba(34,197,94,.15);color:#22c55e;padding:2px 7px;border-radius:4px;font-weight:600">Active</span>
+        </div>
+
+        <!-- Vault & Wallet -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Vault & Wallet Events</div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">vault.created</div><div class="pa-wh-desc">New merchant wallet provisioned in workspace</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">vault.updated</div><div class="pa-wh-desc">Wallet metadata or tags changed</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">wallet.address_created</div><div class="pa-wh-desc">New chain address added to a merchant wallet</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">wallet.deposit_detected</div><div class="pa-wh-desc">Incoming transfer detected across any merchant wallet</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+
+        <!-- Policy -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Policy Events</div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">policy.triggered</div><div class="pa-wh-desc">A rule matched a transaction across any merchant</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">policy.approval_required</div><div class="pa-wh-desc">Multi-sig approval flow initiated — may need PA action</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">policy.updated</div><div class="pa-wh-desc">Workspace or wallet-level policy rules changed</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+
+        <!-- Whitelist -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Whitelist Events</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:6px">PA is the second approver. <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px">whitelist.address_pending_activation</code> fires here before any merchant address goes live.</div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">whitelist.address_added</div><div class="pa-wh-desc">Merchant submitted a new beneficiary address</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">whitelist.address_pending_activation</div><div class="pa-wh-desc">Awaiting PA approval before address can receive funds</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">whitelist.address_activated</div><div class="pa-wh-desc">Address approved — transfers now permitted</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">whitelist.address_removed</div><div class="pa-wh-desc">Address removed from approved list</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+
+        <!-- Exchange -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Exchange Events</div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">exchange.connected</div><div class="pa-wh-desc">New exchange account linked to workspace</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">exchange.sync_completed</div><div class="pa-wh-desc">Balance sync completed across connected exchanges</div></div><div class="notif-toggle off" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">exchange.transfer_completed</div><div class="pa-wh-desc">Exchange ↔ wallet movement settled</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+
+        <!-- Key management -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Key Management Events</div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">key.rotated</div><div class="pa-wh-desc">MPC key shares refreshed across workspace</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">api_key.created</div><div class="pa-wh-desc">New API key generated in workspace</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+          <div class="pa-wh-row"><div><div class="pa-wh-name">api_key.revoked</div><div class="pa-wh-desc">API key deleted or expired</div></div><div class="notif-toggle" onclick="this.classList.toggle('off')"><div class="nt-knob"></div></div></div>
+        </div>
+
+        <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);margin-bottom:6px">Recent deliveries</div>
+          <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">vault.created</span><span class="wh-ts">22 Mar 10:14 · Zara Exports onboarded</span></div>
+          <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">whitelist.address_pending_activation</span><span class="wh-ts">21 Mar 16:40 · Acme Corp</span></div>
+          <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">exchange.transfer_completed</span><span class="wh-ts">21 Mar 09:05 · Coinbase Prime → wallet</span></div>
+          <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">policy.updated</span><span class="wh-ts">20 Mar 11:00 · workspace policy</span></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3)">HMAC-SHA256 · exponential backoff retry · 24h resend window · <strong style="color:rgba(255,255,255,.5)">Scope: all merchants in workspace</strong></div>
+    </div>
+
+    <!-- PA Gas Station view -->
+    <div class="pa-body" id="pa-body-gas" style="display:none;padding:20px 24px;flex-direction:column;gap:14px">
+      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Gas Station</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:-8px;margin-bottom:8px">PayFlow Corp's gas reserves per chain. Silent Pay auto-tops-up when reserves fall below threshold. Merchants never hold or manage ETH.</div>
+      <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:9px 12px;font-size:11px;color:#fbbf24">⚠ Arbitrum reserve below threshold. Auto top-up queued.</div>
+      <div class="gas-chain-grid">
+        <div class="gas-card">
+          <div class="gas-chain-name">Base</div>
+          <div class="gas-bar-wrap"><div class="gas-bar" style="width:72%"></div></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.042 ETH</span></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
+        </div>
+        <div class="gas-card">
+          <div class="gas-chain-name">Ethereum</div>
+          <div class="gas-bar-wrap"><div class="gas-bar" style="width:38%"></div></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.019 ETH</span></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.01 ETH</span></div>
+        </div>
+        <div class="gas-card">
+          <div class="gas-chain-name">Polygon</div>
+          <div class="gas-bar-wrap"><div class="gas-bar" style="width:85%"></div></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">24.8 MATIC</span></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">2 MATIC</span></div>
+        </div>
+        <div class="gas-card">
+          <div class="gas-chain-name">Arbitrum</div>
+          <div class="gas-bar-wrap"><div class="gas-bar warn" style="width:18%"></div></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.004 ETH</span></div>
+          <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;max-width:400px">
+        <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:8px">Global settings</div>
+        <div class="gas-stat-row" style="margin-bottom:5px"><span class="gas-stat-lbl" style="font-size:11px">Max gas price cap</span><span class="gas-stat-val">50 gwei</span></div>
+        <div class="gas-stat-row"><span class="gas-stat-lbl" style="font-size:11px">Top-up source</span><span class="gas-stat-val">PayFlow Master Wallet</span></div>
       </div>
     </div>
   </div>
@@ -1123,13 +1288,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         <div class="sb-label">Platform</div>
         <div class="sb-item" id="nav-reports" onclick="sidebarNav('reports')"><span class="si">◈</span> Reports</div>
         <div class="sb-item" id="nav-policy" onclick="sidebarNav('policy')"><span class="si">⊛</span> Policy Rules</div>
-        <div class="sb-item" id="nav-audit" onclick="sidebarNav('audit')"><span class="si">≡</span> Audit Trail</div>
-        <div class="sb-label">Developer</div>
-        <div class="sb-item" id="nav-dev" onclick="sidebarNav('dev')"><span class="si">⌥</span> Webhooks & API</div>
         <div class="sb-item" id="nav-notif" onclick="sidebarNav('notif')"><span class="si">◎</span> Notifications</div>
         <div class="sb-label">Infrastructure</div>
-        <div class="sb-item" id="nav-gas" onclick="sidebarNav('gas')"><span class="si">⛽</span> Gas Station</div>
-        <div class="sb-item" id="nav-mcurr" onclick="sidebarNav('mcurr')"><span class="si">◆</span> Currencies</div>
       </nav>
       <div class="sb-foot"><span class="live-dot"></span>Live · Powered by Silent Pay</div>
     </div>
@@ -1457,7 +1617,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         </div>
 
         <!-- Proceed to wallet creation -->
-        <div class="chain-proceed" id="chain-proceed">
+        <div class="chain-proceed" id="chain-proceed" onclick="showChainDKG()">
           <div class="cp-left">
             <div class="cp-title">Creating wallets on all 5+ chains</div>
             <div class="cp-sub">$0 cost · ~1–2 seconds · no on-chain transactions</div>
@@ -1466,69 +1626,105 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         </div>
 
         <div class="settings-note">No selection needed here. <strong>Wallet creation is free and instant</strong> — it's pure cryptography, nothing goes on-chain. You choose which chain to route each payment on at transaction time.</div>
+
+        <!-- DKG animation — revealed on proceed click -->
+        <div id="chain-dkg-section" style="display:none;margin-top:14px">
+          <div class="mpc-info" id="mpc-info">
+            <div class="mpc-info-title-row">
+              <div class="mpc-info-title">Distributed Key Generation (DKG)</div>
+              <div class="mpc-computing" id="mpc-computing">⟳ Computing...</div>
+              <div class="mpc-done" id="mpc-done">✓ Complete</div>
+            </div>
+            <div class="mpc-row" id="mr1"><div class="mpc-icon">Run 1</div><div>EVM DKG (secp256k1) — PA server + SGX #1 + SGX #2 each compute a key share</div><div class="mpc-status" id="ms1">waiting</div></div>
+            <div class="mpc-row" id="mr2"><div class="mpc-icon">Output</div><div>EVM public key → <strong style="color:#60a5fa">one address for Base, ETH, Polygon, Arbitrum</strong></div><div class="mpc-status" id="ms2">waiting</div></div>
+            <div class="mpc-row" id="mr3"><div class="mpc-icon">Run 2</div><div>Solana DKG (Ed25519) — separate curve, new 3-party computation</div><div class="mpc-status" id="ms3">waiting</div></div>
+            <div class="mpc-row" id="mr4"><div class="mpc-icon">Output</div><div>Solana public key → <strong style="color:#60a5fa">unique Solana address</strong> · <strong style="color:#4ade80">private key never assembled in either run</strong></div><div class="mpc-status" id="ms4">waiting</div></div>
+          </div>
+          <div class="wallet-grid" id="wallet-grid" style="margin-top:10px">
+            <div class="wallet-card" id="wc-evm">
+              <div class="wc-left">
+                <div style="display:flex;gap:3px;flex-shrink:0">
+                  <div class="wc-chain-badge" style="background:#2563eb;width:22px;height:22px;border-radius:5px;font-size:8px">B</div>
+                  <div class="wc-chain-badge" style="background:#627eea;width:22px;height:22px;border-radius:5px;font-size:8px">E</div>
+                  <div class="wc-chain-badge" style="background:#8247e5;width:22px;height:22px;border-radius:5px;font-size:8px">P</div>
+                  <div class="wc-chain-badge" style="background:#2d374b;width:22px;height:22px;border-radius:5px;font-size:8px">A</div>
+                </div>
+                <div><div class="wc-name">EVM Chains</div><div class="wc-type">Base · ETH · Polygon · Arbitrum · shared address</div></div>
+              </div>
+              <div class="wc-right">
+                <div class="wc-addr">0x742d35Cc6634...8f21</div>
+                <div class="wc-status"><span class="badge badge-green">Active · 4 chains</span></div>
+              </div>
+            </div>
+            <div class="wallet-card" id="wc-sol">
+              <div class="wc-left">
+                <div class="wc-chain-badge" style="background:#9945ff">SOL</div>
+                <div><div class="wc-name">Solana</div><div class="wc-type">Ed25519 · separate DKG run</div></div>
+              </div>
+              <div class="wc-right">
+                <div class="wc-addr">7Kp3mNxQv4Rb...xQ9v</div>
+                <div class="wc-status"><span class="badge badge-green">Active</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- ===== WALLET CREATION ===== -->
+      <!-- ===== WALLETS ===== -->
       <div class="send-view" id="view-wallets">
-        <div class="page-title">Wallet Creation</div>
-        <div class="page-sub">DKG running across all supported chains — 2 runs total</div>
+        <div class="page-title">Wallets</div>
+        <div class="page-sub">2 active wallets · $100,600 total</div>
 
-        <div class="mpc-info" id="mpc-info" style="margin-bottom:12px">
-          <div class="mpc-info-title-row">
-            <div class="mpc-info-title">Distributed Key Generation (DKG)</div>
-            <div class="mpc-computing" id="mpc-computing">⟳ Computing...</div>
-            <div class="mpc-done" id="mpc-done">✓ Complete</div>
+        <div class="wbal-card">
+          <div class="wbal-header">
+            <div>
+              <div class="wbal-name">EVM Wallet</div>
+              <div class="wbal-addr">0x742d…8f21 · Base · Ethereum · Polygon · Arbitrum</div>
+            </div>
+            <div class="wbal-total">$80,500</div>
           </div>
-          <div class="mpc-row" id="mr1">
-            <div class="mpc-icon">Run 1</div>
-            <div>EVM DKG (secp256k1) — PA server + SGX #1 + SGX #2 each compute a key share</div>
-            <div class="mpc-status" id="ms1">waiting</div>
+          <div class="wbal-currencies">
+            <div class="wbal-curr-row">
+              <div class="wbal-curr-left"><span class="wbal-symbol">USDC</span><span class="wbal-chain-tag">Base · ETH · Polygon</span></div>
+              <div class="wbal-curr-right"><div class="wbal-amount">$52,400</div><div class="wbal-change pos">+$25,000 today</div></div>
+            </div>
+            <div class="wbal-curr-row">
+              <div class="wbal-curr-left"><span class="wbal-symbol">USDT</span><span class="wbal-chain-tag">Base · Polygon</span></div>
+              <div class="wbal-curr-right"><div class="wbal-amount">$28,100</div><div class="wbal-change neg">-$8,200 today</div></div>
+            </div>
           </div>
-          <div class="mpc-row" id="mr2">
-            <div class="mpc-icon">Output</div>
-            <div>EVM public key → <strong style="color:#60a5fa">one address for Base, ETH, Polygon, Arbitrum</strong></div>
-            <div class="mpc-status" id="ms2">waiting</div>
-          </div>
-          <div class="mpc-row" id="mr3">
-            <div class="mpc-icon">Run 2</div>
-            <div>Solana DKG (Ed25519) — separate curve, new 3-party computation</div>
-            <div class="mpc-status" id="ms3">waiting</div>
-          </div>
-          <div class="mpc-row" id="mr4">
-            <div class="mpc-icon">Output</div>
-            <div>Solana public key → <strong style="color:#60a5fa">unique Solana address</strong> · <strong style="color:#4ade80">private key never assembled in either run</strong></div>
-            <div class="mpc-status" id="ms4">waiting</div>
+          <div class="wbal-ledger-title">Recent activity</div>
+          <div class="wbal-ledger">
+            <div class="wbal-ledger-row"><span class="wbal-ledger-ts">21 Mar 14:32</span><span class="wbal-ledger-desc">Sent · GlobalTech SG</span><span class="wbal-ledger-amt out">-$25,000 USDC</span></div>
+            <div class="wbal-ledger-row"><span class="wbal-ledger-ts">19 Mar 08:30</span><span class="wbal-ledger-desc">Received · PayFlow Corp top-up</span><span class="wbal-ledger-amt in">+$50,000 USDC</span></div>
+            <div class="wbal-ledger-row"><span class="wbal-ledger-ts">18 Mar 11:00</span><span class="wbal-ledger-desc">Sent · Meridian Logistics Dubai</span><span class="wbal-ledger-amt out">-$8,200 USDT</span></div>
           </div>
         </div>
 
-        <!-- Wallet cards: EVM group + Solana -->
-        <div class="wallet-grid" id="wallet-grid">
-          <div class="wallet-card" id="wc-evm">
-            <div class="wc-left">
-              <div style="display:flex;gap:3px;flex-shrink:0">
-                <div class="wc-chain-badge" style="background:#2563eb;width:22px;height:22px;border-radius:5px;font-size:8px">B</div>
-                <div class="wc-chain-badge" style="background:#627eea;width:22px;height:22px;border-radius:5px;font-size:8px">E</div>
-                <div class="wc-chain-badge" style="background:#8247e5;width:22px;height:22px;border-radius:5px;font-size:8px">P</div>
-                <div class="wc-chain-badge" style="background:#2d374b;width:22px;height:22px;border-radius:5px;font-size:8px">A</div>
-              </div>
-              <div><div class="wc-name">EVM Chains</div><div class="wc-type">Base · ETH · Polygon · Arbitrum · shared address</div></div>
+        <div class="wbal-card" style="margin-top:10px">
+          <div class="wbal-header">
+            <div>
+              <div class="wbal-name">Solana Wallet</div>
+              <div class="wbal-addr">7Kp3…xQ9v · Solana mainnet</div>
             </div>
-            <div class="wc-right">
-              <div class="wc-addr">0x742d35Cc6634...8f21</div>
-              <div class="wc-status"><span class="badge badge-green">Active · 4 chains</span></div>
+            <div class="wbal-total">$20,100</div>
+          </div>
+          <div class="wbal-currencies">
+            <div class="wbal-curr-row">
+              <div class="wbal-curr-left"><span class="wbal-symbol">USDC</span><span class="wbal-chain-tag">Solana</span></div>
+              <div class="wbal-curr-right"><div class="wbal-amount">$12,040</div><div class="wbal-change" style="color:var(--gray)">No change today</div></div>
+            </div>
+            <div class="wbal-curr-row">
+              <div class="wbal-curr-left"><span class="wbal-symbol">USDT</span><span class="wbal-chain-tag">Solana</span></div>
+              <div class="wbal-curr-right"><div class="wbal-amount">$8,060</div><div class="wbal-change" style="color:var(--gray)">No change today</div></div>
             </div>
           </div>
-          <div class="wallet-card" id="wc-sol">
-            <div class="wc-left">
-              <div class="wc-chain-badge" style="background:#9945ff">SOL</div>
-              <div><div class="wc-name">Solana</div><div class="wc-type">Ed25519 · separate DKG run</div></div>
-            </div>
-            <div class="wc-right">
-              <div class="wc-addr">7Kp3mNxQv4Rb...xQ9v</div>
-              <div class="wc-status"><span class="badge badge-green">Active</span></div>
-            </div>
+          <div class="wbal-ledger-title">Recent activity</div>
+          <div class="wbal-ledger">
+            <div class="wbal-ledger-row"><span class="wbal-ledger-ts">17 Mar 09:15</span><span class="wbal-ledger-desc">Received · PayFlow Corp top-up</span><span class="wbal-ledger-amt in">+$20,100 USDC</span></div>
           </div>
         </div>
+        <div style="font-size:11px;color:var(--gray);margin-top:8px">Rates via Coinbase API · updated every 60s</div>
       </div>
 
       <!-- ===== ADD BENEFICIARY ===== -->
@@ -1629,7 +1825,14 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         <!-- Generated link -->
         <div class="generated-link-card" id="generated-link">
           <div class="gl-title">✓ Payment link generated</div>
-          <div class="gl-url">pay.silentpay.io/req/acme-corp/8f2a1c?amt=25000&cur=USDC&chain=base</div>
+          <div class="gl-url">pay.payflowcorp.io/req/acme-corp/8f2a1c?amt=25000&cur=USDC&chain=base</div>
+          <div class="gl-details">
+            <div class="gl-detail-row"><span class="gl-dk">Receiving wallet</span><span class="gl-dv">0x742d35Cc6634...8f21</span></div>
+            <div class="gl-detail-row"><span class="gl-dk">Network</span><span class="gl-dv">Base (EVM)</span></div>
+            <div class="gl-detail-row"><span class="gl-dk">Expected amount</span><span class="gl-dv">25,000 USDC</span></div>
+            <div class="gl-detail-row"><span class="gl-dk">Reference</span><span class="gl-dv">INV-2026-0341</span></div>
+            <div class="gl-detail-row"><span class="gl-dk">Link expires</span><span class="gl-dv">24h · single use</span></div>
+          </div>
           <div class="gl-actions">
             <button class="gl-btn gl-btn-copy">Copy link</button>
             <button class="gl-btn gl-btn-open" onclick="goToPayerPage()">Preview payment page →</button>
@@ -1640,7 +1843,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
       <!-- ===== PAYER CHECKOUT PAGE ===== -->
       <div class="pipeline-view" id="view-payer">
         <div class="payer-page">
-          <div class="pp-topbar"><span class="pp-lock">🔒</span> pay.silentpay.io · Secured by Silent Pay</div>
+          <div class="pp-topbar"><span class="pp-lock">🔒</span> pay.payflowcorp.io · Secured by PayFlow Corp</div>
           <div class="pp-card">
             <div class="pp-header">
               <div class="pp-from">Payment request from</div>
@@ -1648,7 +1851,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
               <div class="pp-amount-big">$25,000</div>
               <div class="pp-amount-sub">25,000 USDC · Base chain · Ref: INV-2026-0341</div>
             </div>
-            <div class="pp-body">
+            <!-- form body -->
+            <div class="pp-body" id="pp-form-body">
               <div class="pp-field">
                 <label>Your name</label>
                 <input type="text" value="James Chen" readonly>
@@ -1658,14 +1862,44 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
                 <input type="text" value="GlobalTech SG Pte Ltd" readonly>
               </div>
               <div class="pp-field">
+                <label>Bank account / wallet</label>
+                <input type="text" value="DBS Bank · SG29DBS0001234567890 (SGD)" readonly style="font-size:11px">
+              </div>
+              <div class="pp-field">
                 <label>Pay from</label>
                 <select><option>Bank transfer (wire)</option><option>USDC wallet</option><option>USDT wallet</option></select>
               </div>
-              <div class="pp-method-note">You will receive bank wire instructions after confirming. Funds convert to USDC automatically.</div>
-              <button class="pp-cta">Confirm & Pay $25,000 →</button>
+              <div class="pp-method-note">Wire instructions will appear after confirming. Funds are converted to USDC by PayFlow Corp automatically.</div>
+              <button class="pp-cta" onclick="payerConfirm()">Confirm & Pay $25,000 →</button>
+            </div>
+            <!-- processing state -->
+            <div class="pp-processing" id="pp-processing">
+              <div class="pp-spinner"></div>
+              <div class="pp-proc-title">Processing payment...</div>
+              <div class="pp-proc-steps">
+                <div class="pp-proc-step" id="ps-1"><div class="ps-icon">1</div> Payment initiated</div>
+                <div class="pp-proc-step" id="ps-2"><div class="ps-icon">2</div> Fiat received · converting to USDC</div>
+                <div class="pp-proc-step" id="ps-3"><div class="ps-icon">3</div> MPC signing transaction</div>
+                <div class="pp-proc-step" id="ps-4"><div class="ps-icon">4</div> Broadcasting on Base chain</div>
+                <div class="pp-proc-step" id="ps-5"><div class="ps-icon">5</div> Confirmed on-chain</div>
+              </div>
+            </div>
+            <!-- success state -->
+            <div class="pp-success" id="pp-success">
+              <div class="pp-success-icon">✓</div>
+              <div class="pp-success-title">Payment sent</div>
+              <div class="pp-success-sub">Acme Corp will receive 25,000 USDC in ~2 min</div>
+              <div class="pp-success-details">
+                <div class="pp-sd-row"><span class="pp-sd-k">Status</span><span class="pp-sd-v green">Confirmed</span></div>
+                <div class="pp-sd-row"><span class="pp-sd-k">Amount</span><span class="pp-sd-v">25,000 USDC</span></div>
+                <div class="pp-sd-row"><span class="pp-sd-k">Network</span><span class="pp-sd-v">Base chain</span></div>
+                <div class="pp-sd-row"><span class="pp-sd-k">Tx hash</span><span class="pp-sd-v">0x8f2a1c...b3d7</span></div>
+                <div class="pp-sd-row"><span class="pp-sd-k">Reference</span><span class="pp-sd-v">INV-2026-0341</span></div>
+                <div class="pp-sd-row"><span class="pp-sd-k">Block</span><span class="pp-sd-v">#21,847,332</span></div>
+              </div>
             </div>
           </div>
-          <div class="pp-footer">Powered by <a>Silent Pay</a> · MPC-secured · Funds settle in ~8 min</div>
+          <div class="pp-footer">Powered by <a>PayFlow Corp</a> · MPC-secured · Funds settle in ~8 min</div>
         </div>
       </div>
 
@@ -1967,59 +2201,18 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
           <button class="rpt-filter">Auth</button>
         </div>
         <div class="audit-table">
-          <div class="audit-thead"><span class="rpt-th">Time</span><span class="rpt-th">Action</span><span class="rpt-th">Actor</span><span class="rpt-th">Result</span></div>
-          <div class="audit-row"><span class="audit-ts">21 Mar 14:32</span><span class="audit-action">transaction.confirmed · $25,000 → GlobalTech SG</span><span class="audit-actor">API key sp_live_***4f2a</span><span class="audit-result ok">OK</span></div>
-          <div class="audit-row"><span class="audit-ts">21 Mar 14:31</span><span class="audit-action">policy.evaluated · amount $25,000 · rule: large-transfer</span><span class="audit-actor">Silent Pay engine</span><span class="audit-result ok">PASS</span></div>
-          <div class="audit-row"><span class="audit-ts">21 Mar 14:30</span><span class="audit-action">transaction.created · vault → GlobalTech SG</span><span class="audit-actor">api/acme-corp</span><span class="audit-result ok">OK</span></div>
-          <div class="audit-row"><span class="audit-ts">21 Mar 09:14</span><span class="audit-action">policy.rule_updated · velocity-limit threshold 20→25</span><span class="audit-actor">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
-          <div class="audit-row"><span class="audit-ts">20 Mar 18:02</span><span class="audit-action">transaction.blocked · destination not whitelisted</span><span class="audit-actor">API key sp_live_***4f2a</span><span class="audit-result blocked">BLOCKED</span></div>
-          <div class="audit-row"><span class="audit-ts">20 Mar 11:45</span><span class="audit-action">api_key.created · Production key for CI/CD</span><span class="audit-actor">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
-          <div class="audit-row"><span class="audit-ts">19 Mar 08:30</span><span class="audit-action">vault.deposit_detected · +$50,000 USDC · Base</span><span class="audit-actor">Silent Pay engine</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-thead"><span class="rpt-th">Time</span><span class="rpt-th">Action</span><span class="rpt-th">Origin</span><span class="rpt-th">Result</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:32</span><span class="audit-action">transaction.completed · $25,000 USDC → GlobalTech SG</span><span class="audit-origin">API key sp_live_***4f2a</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:31</span><span class="audit-action">policy.triggered · rule: large-transfer · $25,000 threshold</span><span class="audit-origin">policy:large-transfer</span><span class="audit-result ok">PASS</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 14:30</span><span class="audit-action">transaction.created · EVM Wallet → GlobalTech SG</span><span class="audit-origin">API key sp_live_***4f2a</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 09:14</span><span class="audit-action">policy.updated · velocity-limit threshold 20→25</span><span class="audit-origin">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">20 Mar 18:02</span><span class="audit-action">transaction.blocked · destination not whitelisted</span><span class="audit-origin">policy:whitelist-only</span><span class="audit-result blocked">BLOCKED</span></div>
+          <div class="audit-row"><span class="audit-ts">21 Mar 11:20</span><span class="audit-action">whitelist.address_activated · GlobalTech SG · 0x4a2f…c91d</span><span class="audit-origin">admin@acmecorp.com</span><span class="audit-result ok">OK</span></div>
+          <div class="audit-row"><span class="audit-ts">19 Mar 08:30</span><span class="audit-action">wallet.deposit_detected · +$50,000 USDC · Base chain</span><span class="audit-origin">on-chain</span><span class="audit-result ok">OK</span></div>
         </div>
         <div class="rpt-export" style="margin-top:10px"><button class="rpt-export-btn">↓ Export Audit Log</button></div>
       </div>
 
-      <!-- ===== WEBHOOKS & API KEYS ===== -->
-      <div class="send-view" id="view-dev">
-        <div class="page-title">Developer</div>
-        <div class="page-sub">Webhooks, API keys, and notification settings</div>
-        <div class="dev-tabs">
-          <div class="dev-tab active" id="dtab-wh" onclick="switchDevTab('wh')">Webhooks</div>
-          <div class="dev-tab" id="dtab-api" onclick="switchDevTab('api')">API Keys</div>
-        </div>
-        <div id="dev-panel-wh">
-          <div class="wh-endpoint-card">
-            <div class="wh-url">https://api.acmecorp.com/silent-pay/webhooks</div>
-            <div class="wh-events">
-              <span class="wh-evt">transaction.completed</span>
-              <span class="wh-evt">transaction.failed</span>
-              <span class="wh-evt">vault.deposit_detected</span>
-              <span class="wh-evt">policy.approval_required</span>
-            </div>
-            <div class="wh-log">
-              <div class="wh-log-title">Recent deliveries</div>
-              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">transaction.completed</span><span class="wh-ts">14:32 today</span></div>
-              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">vault.deposit_detected</span><span class="wh-ts">09:01 today</span></div>
-              <div class="wh-log-row"><span class="wh-status err">503</span><span class="wh-event-name">transaction.failed</span><span class="wh-ts">20 Mar 18:02</span><button class="wh-retry-btn">Retry</button></div>
-              <div class="wh-log-row"><span class="wh-status ok">200</span><span class="wh-event-name">policy.approval_required</span><span class="wh-ts">20 Mar 14:15</span></div>
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--gray);margin-top:6px">HMAC-SHA256 signature verification · exponential backoff retry · 24h resend window</div>
-        </div>
-        <div id="dev-panel-api" style="display:none">
-          <div class="apikey-row">
-            <div class="ak-top"><span class="ak-name">Production — CI/CD pipeline</span><span class="ak-env prod">Production</span></div>
-            <div class="ak-key">sp_live_4f2a••••••••••••••••••••••••••••••••</div>
-            <div class="ak-meta">Created 20 Mar 2026 · Last used 14:32 today</div>
-          </div>
-          <div class="apikey-row">
-            <div class="ak-top"><span class="ak-name">Sandbox — Integration testing</span><span class="ak-env sandbox">Sandbox</span></div>
-            <div class="ak-key">sp_test_8c1d••••••••••••••••••••••••••••••••</div>
-            <div class="ak-meta">Created 15 Mar 2026 · Last used 2 days ago</div>
-            <button class="ak-revoke">Revoke</button>
-          </div>
-        </div>
-      </div>
 
       <!-- ===== NOTIFICATIONS ===== -->
       <div class="send-view" id="view-notif">
@@ -2043,81 +2236,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
       </div>
 
       <!-- ===== GAS STATION ===== -->
-      <div class="send-view" id="view-gas">
-        <div class="page-title">Gas Station</div>
-        <div class="page-sub">Automatic gas top-up — merchants never hold ETH to send USDC</div>
-        <div class="gas-chain-grid" id="gas-chain-grid">
-          <div class="gas-card">
-            <div class="gas-chain-name">Base</div>
-            <div class="gas-bar-wrap"><div class="gas-bar" style="width:72%"></div></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.042 ETH</span></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
-          </div>
-          <div class="gas-card">
-            <div class="gas-chain-name">Ethereum</div>
-            <div class="gas-bar-wrap"><div class="gas-bar" style="width:38%"></div></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.019 ETH</span></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.01 ETH</span></div>
-          </div>
-          <div class="gas-card">
-            <div class="gas-chain-name">Polygon</div>
-            <div class="gas-bar-wrap"><div class="gas-bar" style="width:85%"></div></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">24.8 MATIC</span></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">2 MATIC</span></div>
-          </div>
-          <div class="gas-card">
-            <div class="gas-chain-name">Arbitrum</div>
-            <div class="gas-bar-wrap"><div class="gas-bar warn" style="width:18%"></div></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Reserve</span><span class="gas-stat-val">0.004 ETH</span></div>
-            <div class="gas-stat-row"><span class="gas-stat-lbl">Threshold</span><span class="gas-stat-val">0.005 ETH</span></div>
-          </div>
-        </div>
-        <div style="background:var(--amber-bg);border:1px solid #fcd34d;border-radius:7px;padding:9px 12px;font-size:11px;color:#92400e;margin-bottom:10px">⚠ Arbitrum reserve below threshold. Auto top-up queued.</div>
-        <div style="background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:12px 14px">
-          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">Global settings</div>
-          <div class="gas-stat-row" style="margin-bottom:5px"><span class="gas-stat-lbl" style="font-size:11px">Max gas price cap</span><span class="gas-stat-val">50 gwei</span></div>
-          <div class="gas-stat-row"><span class="gas-stat-lbl" style="font-size:11px">Top-up source vault</span><span class="gas-stat-val">Master Vault · Acme Corp</span></div>
-        </div>
-      </div>
-
       <!-- ===== MULTI-CURRENCY ===== -->
-      <div class="send-view" id="view-mcurr">
-        <div class="page-title">Currency Balances</div>
-        <div class="page-sub">Live stablecoin balances across all wallets and chains</div>
-        <div class="mcurr-alloc-bar" style="margin-bottom:12px;border-radius:4px">
-          <div class="mcurr-alloc-seg" style="width:52%;background:#2563eb"></div>
-          <div class="mcurr-alloc-seg" style="width:28%;background:#16a34a"></div>
-          <div class="mcurr-alloc-seg" style="width:12%;background:#d97706"></div>
-          <div class="mcurr-alloc-seg" style="width:8%;background:#7c3aed"></div>
-        </div>
-        <div class="mcurr-grid">
-          <div class="mcurr-card">
-            <div class="mcurr-top"><span class="mcurr-symbol">USDC</span><span class="mcurr-chain">Base · ETH · Polygon</span></div>
-            <div class="mcurr-amount">$52,400</div>
-            <div class="mcurr-usd">≈ $52,400 USD · 52% of portfolio</div>
-            <div class="mcurr-change pos" style="margin-top:4px">+$25,000 today</div>
-          </div>
-          <div class="mcurr-card">
-            <div class="mcurr-top"><span class="mcurr-symbol">USDT</span><span class="mcurr-chain">Base · Polygon</span></div>
-            <div class="mcurr-amount">$28,100</div>
-            <div class="mcurr-usd">≈ $28,100 USD · 28% of portfolio</div>
-            <div class="mcurr-change neg" style="margin-top:4px">-$8,200 today</div>
-          </div>
-          <div class="mcurr-card">
-            <div class="mcurr-top"><span class="mcurr-symbol">EURC</span><span class="mcurr-chain">Base</span></div>
-            <div class="mcurr-amount">€11,200</div>
-            <div class="mcurr-usd">≈ $12,040 USD · 12% of portfolio</div>
-            <div class="mcurr-change pos" style="margin-top:4px">No change today</div>
-          </div>
-          <div class="mcurr-card">
-            <div class="mcurr-top"><span class="mcurr-symbol">USDT</span><span class="mcurr-chain">Solana</span></div>
-            <div class="mcurr-amount">$8,060</div>
-            <div class="mcurr-usd">≈ $8,060 USD · 8% of portfolio</div>
-            <div class="mcurr-change pos" style="margin-top:4px">No change today</div>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--gray-light);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--gray)">Total portfolio value: <strong style="color:var(--navy)">$100,600</strong> · Rates updated every 60 seconds via Coinbase API</div>
-      </div>
 
     </div><!-- /main-panel -->
   </div><!-- /device-frame -->
@@ -2161,8 +2280,48 @@ function selectReceiveCurrency(id) {
   const el = document.getElementById(id); if (el) el.classList.add('sel');
 }
 function goToPayerPage() {
+  // reset payer page to form state on each open
+  document.getElementById('pp-form-body').style.display = 'block';
+  document.getElementById('pp-processing').style.display = 'none';
+  document.getElementById('pp-success').style.display = 'none';
+  ['ps-1','ps-2','ps-3','ps-4','ps-5'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('done','active'); }
+  });
   const idx = STEPS.findIndex(s => s.view === 'payer');
   if (idx !== -1) goTo(idx);
+}
+
+function payerConfirm() {
+  document.getElementById('pp-form-body').style.display = 'none';
+  const proc = document.getElementById('pp-processing');
+  proc.style.display = 'flex';
+  const steps = ['ps-1','ps-2','ps-3','ps-4','ps-5'];
+  const delays = [0, 900, 1800, 2700, 3500];
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      if (i > 0) document.getElementById(steps[i-1]).classList.remove('active');
+      const el = document.getElementById(id);
+      if (i < steps.length - 1) {
+        el.classList.add('active');
+        el.querySelector('.ps-icon').textContent = '·';
+      } else {
+        el.classList.add('done');
+        el.querySelector('.ps-icon').textContent = '✓';
+      }
+      // mark previous as done
+      if (i > 0) {
+        const prev = document.getElementById(steps[i-1]);
+        prev.classList.add('done');
+        prev.querySelector('.ps-icon').textContent = '✓';
+      }
+    }, delays[i]);
+  });
+  // show success after all steps
+  setTimeout(() => {
+    proc.style.display = 'none';
+    document.getElementById('pp-success').style.display = 'flex';
+  }, 4400);
 }
 
 // ── STABLECOIN PICKER ──
@@ -2299,8 +2458,8 @@ const STEPS = [
   },
   {
     id:6, section:'Setup',
-    view:'wallets', highlight:'wallet-grid', nav:'nav-wallets',
-    onEnter: revealWallets,
+    view:'chain', highlight:'wallet-grid', nav:'nav-wallets',
+    onEnter: function() { showChainDKG(); },
     tooltip:{
       title:'2 DKG runs · 5 chains covered',
       body:'<strong>Run 1 (EVM):</strong> One DKG on secp256k1 → one address valid on Base, ETH, Polygon, Arbitrum simultaneously.<br><br><strong>Run 2 (Solana):</strong> Separate DKG on Ed25519 → unique Solana address.<br><br>Private key never assembled in either run.',
@@ -2310,7 +2469,8 @@ const STEPS = [
   },
   {
     id:7, section:'Setup',
-    view:'wallets', highlight:'mpc-info', nav:'nav-wallets',
+    view:'chain', highlight:'chain-dkg-section', nav:'nav-wallets',
+    onEnter: function() { showChainDKG(); },
     tooltip:{
       title:'Why 2 runs, not 5?',
       body:'Base, ETH, Polygon, and Arbitrum all use the <strong>same elliptic curve (secp256k1)</strong> → same public key → same wallet address. One DKG covers all four.<br><br>Solana uses <strong>Ed25519</strong> (different maths, different key format) → a completely separate DKG is needed. That\'s it — 2 runs total regardless of how many EVM chains the PA adds.',
@@ -2466,26 +2626,6 @@ const STEPS = [
     }
   },
   {
-    id:22, section:'Platform',
-    view:'audit', highlight:'audit-table', nav:'nav-audit',
-    tooltip:{
-      title:'Audit trail — SOC 2 ready',
-      body:'Every action logged with timestamp, actor (user or API key), and outcome. Policy evaluations, transaction events, admin changes — all immutable records.<br><br><strong>Blocked</strong> events are flagged in red. Export the full log for compliance reviews.',
-      chip:'📋 SOC 2 · 90-day retention · exportable',
-      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
-    }
-  },
-  {
-    id:23, section:'Platform',
-    view:'dev', highlight:'wh-endpoint-card', nav:'nav-dev',
-    tooltip:{
-      title:'Webhooks — real-time event delivery',
-      body:'Configure endpoints and subscribe to events: <code>transaction.completed</code>, <code>transaction.failed</code>, <code>vault.deposit_detected</code>, <code>policy.approval_required</code>.<br><br>Delivery log shows HTTP status per event. Failed deliveries (503) show a <strong>Retry</strong> button. 24-hour resend window.',
-      chip:'⚡ HMAC-signed · exponential backoff retry',
-      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
-    }
-  },
-  {
     id:24, section:'Platform',
     view:'notif', highlight:null, nav:'nav-notif',
     tooltip:{
@@ -2496,26 +2636,6 @@ const STEPS = [
     }
   },
   // ── SECTION 7: INFRASTRUCTURE ────────────────────────────────
-  {
-    id:25, section:'Infrastructure',
-    view:'gas', highlight:'gas-chain-grid', nav:'nav-gas',
-    tooltip:{
-      title:'Gas station — merchants never hold ETH',
-      body:'Silent Pay maintains a gas reserve vault per workspace. When a chain\'s reserve drops below the configured threshold, it auto-tops-up from the master vault.<br><br>Arbitrum is currently below threshold — a top-up is queued. The merchant never sees or manages gas.',
-      chip:'⛽ Auto top-up · 4 chains · threshold alerts',
-      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
-    }
-  },
-  {
-    id:27, section:'Infrastructure',
-    view:'mcurr', highlight:null, nav:'nav-mcurr',
-    tooltip:{
-      title:'Multi-currency breakdown',
-      body:'Live balances across every stablecoin and chain — USDC, USDT, EURC — with USD equivalents. The allocation bar shows portfolio composition at a glance.<br><br>Rates refresh every 60 seconds via Coinbase API. This view is the treasury dashboard for a PA\'s finance team.',
-      chip:'💱 USDC · USDT · EURC · live rates',
-      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
-    }
-  },
 ];
 
 const TOTAL = STEPS.length;
@@ -2570,23 +2690,22 @@ function submitConnectExchange() {
 }
 
 function switchPATab(tab) {
-  const isBiz = tab === 'businesses';
-  document.getElementById('pa-body-businesses').style.display = isBiz ? '' : 'none';
-  document.getElementById('pa-body-exchanges').style.display = isBiz ? 'none' : 'flex';
-  document.getElementById('pa-tab-businesses').style.background = isBiz ? 'linear-gradient(135deg,#2563eb,#7c3aed)' : 'transparent';
-  document.getElementById('pa-tab-businesses').style.color = isBiz ? '#fff' : 'rgba(255,255,255,.5)';
-  document.getElementById('pa-tab-exchanges').style.background = isBiz ? 'transparent' : 'linear-gradient(135deg,#2563eb,#7c3aed)';
-  document.getElementById('pa-tab-exchanges').style.color = isBiz ? 'rgba(255,255,255,.5)' : '#fff';
+  ['businesses','exchanges','gas','webhooks'].forEach(t => {
+    const isActive = t === tab;
+    document.getElementById('pa-body-' + t).style.display = isActive ? 'flex' : 'none';
+    document.getElementById('pa-tab-' + t).style.background = isActive ? 'linear-gradient(135deg,#2563eb,#7c3aed)' : 'transparent';
+    document.getElementById('pa-tab-' + t).style.color = isActive ? '#fff' : 'rgba(255,255,255,.5)';
+  });
 }
 
 function showMerchantDetail() {
-  document.getElementById('pa-body-businesses').style.display = 'none';
+  ['businesses','exchanges','gas','webhooks'].forEach(t => document.getElementById('pa-body-' + t).style.display = 'none');
   document.getElementById('pa-merchant-detail').classList.add('visible');
 }
 
 function hideMerchantDetail() {
   document.getElementById('pa-merchant-detail').classList.remove('visible');
-  document.getElementById('pa-body-businesses').style.display = '';
+  switchPATab('businesses');
   switchMerchantTab('settings');
 }
 
@@ -2652,14 +2771,14 @@ function goTo(idx) {
 }
 
 // ── VIEW SWITCHER ──
-const VIEW_IDS = ['view-dashboard','view-fund','view-stablecoin','view-chain','view-wallets','view-add-bene','view-receive','view-payer','view-bene','view-amount','view-fx','view-review','view-pipeline','view-complete','view-reports','view-policy','view-audit','view-dev','view-notif','view-gas','view-exc','view-mcurr'];
+const VIEW_IDS = ['view-dashboard','view-fund','view-stablecoin','view-chain','view-wallets','view-add-bene','view-receive','view-payer','view-bene','view-amount','view-fx','view-review','view-pipeline','view-complete','view-reports','view-policy','view-notif'];
 const VIEW_MAP = {
   'dashboard':'view-dashboard','fund':'view-fund','stablecoin':'view-stablecoin','chain':'view-chain',
   'wallets':'view-wallets','add-bene':'view-add-bene','receive':'view-receive','payer':'view-payer',
   'bene':'view-bene','amount':'view-amount','fx':'view-fx',
   'review':'view-review','pipeline':'view-pipeline','complete':'view-complete',
-  'reports':'view-reports','policy':'view-policy','audit':'view-audit',
-  'dev':'view-dev','notif':'view-notif','gas':'view-gas','mcurr':'view-mcurr',
+  'reports':'view-reports','policy':'view-policy',
+  'notif':'view-notif',
 };
 function switchView(name) {
   VIEW_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display='none'; });
@@ -2820,8 +2939,8 @@ function sidebarNav(viewName) {
   switchView(viewName);
   document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
   const navMap = {
-    'dashboard':'nav-dash','reports':'nav-reports','policy':'nav-policy','audit':'nav-audit',
-    'dev':'nav-dev','notif':'nav-notif','gas':'nav-gas','mcurr':'nav-mcurr',
+    'dashboard':'nav-dash','reports':'nav-reports','policy':'nav-policy',
+    'notif':'nav-notif',
   };
   const navId = navMap[viewName];
   if (navId) { const el = document.getElementById(navId); if (el) el.classList.add('active'); }
@@ -2858,6 +2977,15 @@ function showTooltip(step) {
   // show topbar explore button on last step
   const btnExp = document.getElementById('btn-explore');
   if (btnExp) btnExp.style.display = isLast ? 'inline-flex' : 'none';
+}
+
+// ── SHOW DKG ON CHAIN TAB ──
+function showChainDKG() {
+  const section = document.getElementById('chain-dkg-section');
+  if (!section) return;
+  section.style.display = 'block';
+  document.getElementById('chain-proceed').style.display = 'none';
+  revealWallets();
 }
 
 // ── WALLET REVEAL ANIMATION ──
