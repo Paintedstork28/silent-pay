@@ -734,12 +734,16 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         <div class="pa-brand-name">Silent Pay</div>
         <div class="pa-entity-pill">PA Console · PayFlow Corp (Licensed Payments Entity)</div>
       </div>
+      <div style="display:flex;gap:0;margin-left:auto;margin-right:16px;background:rgba(255,255,255,.06);border-radius:7px;padding:3px">
+        <button id="pa-tab-businesses" onclick="switchPATab('businesses')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff">Businesses</button>
+        <button id="pa-tab-exchanges" onclick="switchPATab('exchanges')" style="padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);background:transparent;color:rgba(255,255,255,.5)">Exchanges</button>
+      </div>
       <div class="pa-user">
         <span>admin@payflowcorp.com</span>
         <div class="pa-avatar">PF</div>
       </div>
     </div>
-    <div class="pa-body">
+    <div class="pa-body" id="pa-body-businesses">
       <div class="pa-stats">
         <div class="pa-stat">
           <div class="pa-stat-val">247</div>
@@ -827,6 +831,37 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
           <div><button class="pa-view-btn disabled">View →</button></div>
         </div>
       </div>
+    </div>
+
+    <!-- PA Exchanges view -->
+    <div class="pa-body" id="pa-body-exchanges" style="display:none;padding:20px 24px;flex-direction:column;gap:14px">
+      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">Exchange Connections</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:-8px;margin-bottom:8px">PayFlow Corp's connected exchange accounts. Credentials stored encrypted. Used for on-ramp and off-ramp orchestration across all merchant wallets.</div>
+      <div class="exc-conn-card">
+        <div class="exc-conn-top">
+          <span class="exc-conn-name">Coinbase Prime</span>
+          <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 2 min ago</span>
+        </div>
+        <div class="exc-balances">
+          <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$142,800</div></div>
+          <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$38,400</div></div>
+          <div class="exc-bal-item"><div class="exc-bal-symbol">PYUSD</div><div class="exc-bal-amount">$12,000</div></div>
+        </div>
+        <div class="exc-meta">Stablecoins: USDC, USDT, PYUSD, EURC · API key: cb_prime_***9a4c · <span style="color:#22c55e">BYOK</span></div>
+      </div>
+      <div class="exc-conn-card">
+        <div class="exc-conn-top">
+          <span class="exc-conn-name">Kraken</span>
+          <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 5 min ago</span>
+        </div>
+        <div class="exc-balances">
+          <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$89,200</div></div>
+          <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$54,100</div></div>
+          <div class="exc-bal-item"><div class="exc-bal-symbol">EURT</div><div class="exc-bal-amount">€18,500</div></div>
+        </div>
+        <div class="exc-meta">Stablecoins: USDC, USDT, EURT · API key: kr_***7f1d · <span style="color:#22c55e">BYOK</span></div>
+      </div>
+      <button style="align-self:flex-start;padding:8px 16px;border-radius:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)">+ Connect Exchange</button>
     </div>
   </div>
 
@@ -1063,7 +1098,6 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         <div class="sb-item" id="nav-notif" onclick="sidebarNav('notif')"><span class="si">◎</span> Notifications</div>
         <div class="sb-label">Infrastructure</div>
         <div class="sb-item" id="nav-gas" onclick="sidebarNav('gas')"><span class="si">⛽</span> Gas Station</div>
-        <div class="sb-item" id="nav-exc" onclick="sidebarNav('exc')"><span class="si">⇄</span> Exchanges</div>
         <div class="sb-item" id="nav-mcurr" onclick="sidebarNav('mcurr')"><span class="si">◆</span> Currencies</div>
       </nav>
       <div class="sb-foot"><span class="live-dot"></span>Live · Powered by Silent Pay</div>
@@ -2015,37 +2049,6 @@ body{font-family:var(--font);background:var(--navy);color:var(--navy);font-size:
         </div>
       </div>
 
-      <!-- ===== EXCHANGE CONNECTIVITY ===== -->
-      <div class="send-view" id="view-exc">
-        <div class="page-title">Exchange Connectivity</div>
-        <div class="page-sub">PA-managed exchange accounts · BYOK available for enterprise</div>
-        <div class="exc-conn-card">
-          <div class="exc-conn-top">
-            <span class="exc-conn-name">Coinbase Prime</span>
-            <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 2 min ago</span>
-          </div>
-          <div class="exc-balances">
-            <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$142,800</div></div>
-            <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$38,400</div></div>
-            <div class="exc-bal-item"><div class="exc-bal-symbol">PYUSD</div><div class="exc-bal-amount">$12,000</div></div>
-          </div>
-          <div class="exc-meta">Supported stablecoins: USDC, USDT, PYUSD, EURC · API key: cb_prime_***9a4c</div>
-        </div>
-        <div class="exc-conn-card">
-          <div class="exc-conn-top">
-            <span class="exc-conn-name">Kraken</span>
-            <span class="exc-conn-status"><span class="exc-dot"></span>Connected · synced 5 min ago</span>
-          </div>
-          <div class="exc-balances">
-            <div class="exc-bal-item"><div class="exc-bal-symbol">USDC</div><div class="exc-bal-amount">$89,200</div></div>
-            <div class="exc-bal-item"><div class="exc-bal-symbol">USDT</div><div class="exc-bal-amount">$54,100</div></div>
-            <div class="exc-bal-item"><div class="exc-bal-symbol">EURT</div><div class="exc-bal-amount">€18,500</div></div>
-          </div>
-          <div class="exc-meta">Supported stablecoins: USDC, USDT, EURT · API key: kr_***7f1d</div>
-        </div>
-        <div style="background:var(--blue-light);border:1px solid #bfdbfe;border-radius:7px;padding:9px 12px;font-size:11px;color:var(--blue)">Enterprise clients can connect their own exchange accounts (BYOK). Contact your PA for activation.</div>
-      </div>
-
       <!-- ===== MULTI-CURRENCY ===== -->
       <div class="send-view" id="view-mcurr">
         <div class="page-title">Currency Balances</div>
@@ -2473,16 +2476,6 @@ const STEPS = [
     }
   },
   {
-    id:26, section:'Infrastructure',
-    view:'exc', highlight:'exc-conn-card', nav:'nav-exc',
-    tooltip:{
-      title:'Exchange connectivity — PA-managed accounts',
-      body:'The PA connects its exchange accounts (Coinbase Prime + Kraken) once. Silent Pay uses those connections to move stablecoins between exchange and vault — the merchant never touches the exchange directly.<br><br><strong>Enterprise BYOK:</strong> large clients can plug in their own exchange API keys instead.',
-      chip:'🔗 Coinbase Prime + Kraken · BYOK for enterprise',
-      pos:{top:'14%',right:'-300px'}, arrow:'arrow-left',
-    }
-  },
-  {
     id:27, section:'Infrastructure',
     view:'mcurr', highlight:null, nav:'nav-mcurr',
     tooltip:{
@@ -2528,14 +2521,24 @@ function hidePAConsole() {
   document.getElementById('login-landing').classList.remove('hidden');
 }
 
+function switchPATab(tab) {
+  const isBiz = tab === 'businesses';
+  document.getElementById('pa-body-businesses').style.display = isBiz ? '' : 'none';
+  document.getElementById('pa-body-exchanges').style.display = isBiz ? 'none' : 'flex';
+  document.getElementById('pa-tab-businesses').style.background = isBiz ? 'linear-gradient(135deg,#2563eb,#7c3aed)' : 'transparent';
+  document.getElementById('pa-tab-businesses').style.color = isBiz ? '#fff' : 'rgba(255,255,255,.5)';
+  document.getElementById('pa-tab-exchanges').style.background = isBiz ? 'transparent' : 'linear-gradient(135deg,#2563eb,#7c3aed)';
+  document.getElementById('pa-tab-exchanges').style.color = isBiz ? 'rgba(255,255,255,.5)' : '#fff';
+}
+
 function showMerchantDetail() {
-  document.querySelector('#pa-console .pa-body').style.display = 'none';
+  document.getElementById('pa-body-businesses').style.display = 'none';
   document.getElementById('pa-merchant-detail').classList.add('visible');
 }
 
 function hideMerchantDetail() {
   document.getElementById('pa-merchant-detail').classList.remove('visible');
-  document.querySelector('#pa-console .pa-body').style.display = '';
+  document.getElementById('pa-body-businesses').style.display = '';
   switchMerchantTab('settings');
 }
 
@@ -2608,7 +2611,7 @@ const VIEW_MAP = {
   'bene':'view-bene','amount':'view-amount','fx':'view-fx',
   'review':'view-review','pipeline':'view-pipeline','complete':'view-complete',
   'reports':'view-reports','policy':'view-policy','audit':'view-audit',
-  'dev':'view-dev','notif':'view-notif','gas':'view-gas','exc':'view-exc','mcurr':'view-mcurr',
+  'dev':'view-dev','notif':'view-notif','gas':'view-gas','mcurr':'view-mcurr',
 };
 function switchView(name) {
   VIEW_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display='none'; });
@@ -2770,7 +2773,7 @@ function sidebarNav(viewName) {
   document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
   const navMap = {
     'dashboard':'nav-dash','reports':'nav-reports','policy':'nav-policy','audit':'nav-audit',
-    'dev':'nav-dev','notif':'nav-notif','gas':'nav-gas','exc':'nav-exc','mcurr':'nav-mcurr',
+    'dev':'nav-dev','notif':'nav-notif','gas':'nav-gas','mcurr':'nav-mcurr',
   };
   const navId = navMap[viewName];
   if (navId) { const el = document.getElementById(navId); if (el) el.classList.add('active'); }
